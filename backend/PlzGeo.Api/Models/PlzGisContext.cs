@@ -1,0 +1,179 @@
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
+
+namespace PlzGeo.Api.Models;
+
+public partial class PlzGisContext : DbContext
+{
+    public PlzGisContext()
+    {
+    }
+
+    public PlzGisContext(DbContextOptions<PlzGisContext> options)
+        : base(options)
+    {
+    }
+
+    public virtual DbSet<GroupLegendItem> GroupLegendItems { get; set; }
+
+    public virtual DbSet<HeatmapLegendItem> HeatmapLegendItems { get; set; }
+
+    public virtual DbSet<PostalArea> PostalAreas { get; set; }
+
+    public virtual DbSet<User> Users { get; set; }
+
+    public virtual DbSet<Visualization> Visualizations { get; set; }
+
+    public virtual DbSet<VisualizationValue> VisualizationValues { get; set; }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=plzdb;Username=admin;Password=danbandev99", x => x.UseNetTopologySuite());
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder
+            .HasPostgresExtension("fuzzystrmatch")
+            .HasPostgresExtension("postgis")
+            .HasPostgresExtension("tiger", "postgis_tiger_geocoder")
+            .HasPostgresExtension("topology", "postgis_topology");
+
+        modelBuilder.Entity<GroupLegendItem>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("group_legend_items_pkey");
+
+            entity.ToTable("group_legend_items");
+
+            entity.Property(e => e.Id)
+                .ValueGeneratedNever()
+                .HasColumnName("id");
+            entity.Property(e => e.Color)
+                .HasMaxLength(20)
+                .HasColumnName("color");
+            entity.Property(e => e.Name)
+                .HasMaxLength(100)
+                .HasColumnName("name");
+            entity.Property(e => e.Value).HasColumnName("value");
+            entity.Property(e => e.VisualizationId).HasColumnName("visualization_id");
+
+            entity.HasOne(d => d.Visualization).WithMany(p => p.GroupLegendItems)
+                .HasForeignKey(d => d.VisualizationId)
+                .HasConstraintName("group_legend_items_visualization_id_fkey");
+        });
+
+        modelBuilder.Entity<HeatmapLegendItem>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("heatmap_legend_items_pkey");
+
+            entity.ToTable("heatmap_legend_items");
+
+            entity.Property(e => e.Id)
+                .ValueGeneratedNever()
+                .HasColumnName("id");
+            entity.Property(e => e.Color)
+                .HasMaxLength(20)
+                .HasColumnName("color");
+            entity.Property(e => e.FromValue).HasColumnName("from_value");
+            entity.Property(e => e.ToValue).HasColumnName("to_value");
+            entity.Property(e => e.VisualizationId).HasColumnName("visualization_id");
+
+            entity.HasOne(d => d.Visualization).WithMany(p => p.HeatmapLegendItems)
+                .HasForeignKey(d => d.VisualizationId)
+                .HasConstraintName("heatmap_legend_items_visualization_id_fkey");
+        });
+
+        modelBuilder.Entity<PostalArea>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("postal_areas_pkey");
+
+            entity.ToTable("postal_areas");
+
+            entity.HasIndex(e => e.PostalCode, "postal_areas_plz_key").IsUnique();
+
+            entity.HasIndex(e => e.PostalCode, "uq_postal_areas_plz").IsUnique();
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.PostalCode)
+                .HasMaxLength(5)
+                .HasColumnName("postal_code");
+        });
+
+        modelBuilder.Entity<User>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("users_pkey");
+
+            entity.ToTable("users");
+
+            entity.HasIndex(e => e.Email, "users_email_key").IsUnique();
+
+            entity.Property(e => e.Id)
+                .ValueGeneratedNever()
+                .HasColumnName("id");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("now()")
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("created_at");
+            entity.Property(e => e.Email)
+                .HasMaxLength(255)
+                .HasColumnName("email");
+            entity.Property(e => e.PasswordHash).HasColumnName("password_hash");
+        });
+
+        modelBuilder.Entity<Visualization>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("visualizations_pkey");
+
+            entity.ToTable("visualizations");
+
+            entity.Property(e => e.Id)
+                .ValueGeneratedNever()
+                .HasColumnName("id");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("now()")
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("created_at");
+            entity.Property(e => e.Name)
+                .HasMaxLength(200)
+                .HasColumnName("name");
+            entity.Property(e => e.Type)
+                .HasMaxLength(50)
+                .HasColumnName("type");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+
+            entity.HasOne(d => d.User).WithMany(p => p.Visualizations)
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("visualizations_user_id_fkey");
+        });
+
+        modelBuilder.Entity<VisualizationValue>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("visualization_values_pkey");
+
+            entity.ToTable("visualization_values");
+
+            entity.HasIndex(e => new { e.VisualizationId, e.PostalAreaId }, "uq_visualization_postal_area").IsUnique();
+
+            entity.Property(e => e.Id)
+                .ValueGeneratedNever()
+                .HasColumnName("id");
+            entity.Property(e => e.PostalAreaId).HasColumnName("postal_area_id");
+            entity.Property(e => e.Value).HasColumnName("value");
+            entity.Property(e => e.VisualizationId).HasColumnName("visualization_id");
+
+            entity.HasOne(d => d.PostalArea).WithMany(p => p.VisualizationValues)
+                .HasForeignKey(d => d.PostalAreaId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("visualization_values_postal_area_id_fkey");
+
+            entity.HasOne(d => d.Visualization).WithMany(p => p.VisualizationValues)
+                .HasForeignKey(d => d.VisualizationId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("visualization_values_visualization_id_fkey");
+        });
+
+        OnModelCreatingPartial(modelBuilder);
+    }
+
+    partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+}

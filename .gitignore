@@ -1,0 +1,108 @@
+########################################
+# Angular frontend
+########################################
+
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+
+# Angular environment files with secrets
+frontend/src/environments/environment*.ts
+
+
+########################################
+# ASP.NET Core backend
+########################################
+
+backend/bin/
+backend/obj/
+**/bin/
+**/obj/
+
+# Generated files
+backend/Generated/*.geojson
+
+# User specific settings
+backend/*.user
+backend/*.suo
+
+
+########################################
+# Entity Framework / local databases
+########################################
+
+*.db
+*.sqlite
+*.sqlite3
+
+
+########################################
+# Configuration / Secrets
+########################################
+
+.env
+*.env
+
+appsettings.Development.json
+appsettings.*.Development.json
+
+# User secrets
+secrets.json
+
+
+########################################
+# GIS data
+########################################
+
+# Local GIS source data
+data/
+
+# GIS temporary/project files
+*.qgz
+*.qgs
+*.qgd
+
+# GeoJSON generated locally
+*.geojson
+
+
+########################################
+# Docker
+########################################
+
+docker-compose.override.yml
+
+
+########################################
+# Visual Studio
+########################################
+
+.vs/
+*.user
+*.rsuser
+*.suo
+
+
+########################################
+# JetBrains Rider
+########################################
+
+.idea/
+
+
+########################################
+# Build / temporary files
+########################################
+
+*.log
+*.tmp
+*.cache
+
+
+########################################
+# Operating system
+########################################
+
+.DS_Store
+Thumbs.db
+desktop.ini
