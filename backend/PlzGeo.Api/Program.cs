@@ -12,6 +12,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<PlzGisContext>(options =>
     options.UseNpgsql(
         builder.Configuration.GetConnectionString("Postgis")));
+builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
 var app = builder.Build();
 
