@@ -1,5 +1,9 @@
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using PlzGeo.Api.Models;
+using PlzGeo.Api.Profiles;
+using PlzGeo.Api.Services;
+using PlzGeo.Api.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,7 +16,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<PlzGisContext>(options =>
     options.UseNpgsql(
         builder.Configuration.GetConnectionString("Postgis")));
-builder.Services.AddAutoMapper(typeof(Program).Assembly);
+builder.Services.AddAutoMapper(cfg => { }, typeof(MappingProfile));
+builder.Services.AddScoped<IVisualizationService, VisualizationService>();
 
 var app = builder.Build();
 

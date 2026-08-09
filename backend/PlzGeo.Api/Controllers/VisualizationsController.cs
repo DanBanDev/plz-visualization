@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using PlzGeo.Api.Dtos;
 using PlzGeo.Api.Models;
+using PlzGeo.Api.Services.Interfaces;
 
 namespace PlzGeo.Api.Controllers
 {
@@ -8,24 +10,24 @@ namespace PlzGeo.Api.Controllers
     [ApiController]
     public class VisualizationsController : ControllerBase
     {
-        [HttpGet]
-        public ActionResult<IEnumerable<VisualizationSummary>> Get()
+        private readonly IVisualizationService _visualizationService;
+
+        public VisualizationsController(
+            IVisualizationService visualizationService)
         {
-            return Ok(new[]
-            {
-            new VisualizationSummary
-            {
-                Id = Guid.NewGuid(),
-                Name = "Einwohnerdichte",
-                Type = "Heatmap"
-            },
-            new VisualizationSummary
-            {
-                Id = Guid.NewGuid(),
-                Name = "Vertriebsregionen",
-                Type = "Group"
-            }
-        });
+            _visualizationService = visualizationService;
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<List<VisualizationSummaryDto>>> Get()
+        {
+            // Temporäre Test-UserId
+            var userId = Guid.Parse("c369438e-5935-4273-8080-6ae7b4b61301");
+
+            var visualizations =
+                await _visualizationService.GetVisualizationsAsync(userId);
+
+            return Ok(visualizations);
         }
 
     }
