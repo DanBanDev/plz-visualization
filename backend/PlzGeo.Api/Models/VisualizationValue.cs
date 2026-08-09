@@ -5,8 +5,6 @@ namespace PlzGeo.Api.Models;
 
 public partial class VisualizationValue
 {
-    public Guid Id { get; set; }
-
     public Guid VisualizationId { get; set; }
 
     public int PostalAreaId { get; set; }
