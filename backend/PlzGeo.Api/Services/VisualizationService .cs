@@ -34,14 +34,18 @@ namespace PlzGeo.Api.Services
                 .Where(v => v.UserId == userId && v.Id == id)
                 .ProjectTo<VisualizationInfoDto>(_mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync();
-             
+
+            if (visualizationInfo == null)
+            {
+                throw new KeyNotFoundException("Visualization not found");
+            }
 
             var visualizationValues = await _context.VisualizationValues
                 .Where(vv => vv.VisualizationId == id)
                 .ProjectTo<VisualizationValueDto>(_mapper.ConfigurationProvider)
                 .ToListAsync();
 
-            if(visualizationInfo.Type == VisualizationType.Group)
+            if (visualizationInfo.Type == VisualizationType.Group)
             {
                var groupLegendItems = await _context.GroupLegendItems
                     .Where(li => li.VisualizationId == id)

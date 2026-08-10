@@ -19,7 +19,10 @@ namespace PlzGeo.Api.Profiles
 
             CreateMap<Visualization, HeatmapVisualizationDto>();
 
-            CreateMap<VisualizationValue, VisualizationValueDto>();
+            CreateMap<VisualizationValue, VisualizationValueDto>()
+                    .ForMember(
+                        dest => dest.PostalCode,
+                        opt => opt.MapFrom(src => src.PostalArea.PostalCode));
 
             CreateMap<GroupLegendItem, GroupLegendItemDto>();
 
