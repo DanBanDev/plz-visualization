@@ -59,5 +59,27 @@ namespace PlzGeo.Api.Controllers
             return Ok(heatmapDto);
         }
 
+        [HttpPost]
+        public async Task<ActionResult<VisualizationInfoDto>> UploadHeatmapVisualization([FromBody] CreateHeatmapVisualizationDto createDto)
+        {
+            // Temporäre Test-UserId
+            var userId = Guid.Parse("c369438e-5935-4273-8080-6ae7b4b61301");
+
+            var visualizationInfo = await _visualizationService.CreateHeatmapVisualization(userId, createDto);
+
+            return Ok(visualizationInfo);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<VisualizationInfoDto>> UploadGroupVisualization([FromBody] CreateGroupVisualizationDto createDto)
+        {
+            // Temporäre Test-UserId
+            var userId = Guid.Parse("c369438e-5935-4273-8080-6ae7b4b61301");
+
+            var visualizationInfo = await _visualizationService.CreateGroupVisualization(userId, createDto);
+
+            return Ok(visualizationInfo);
+        }
+
     }
 }

@@ -47,18 +47,18 @@ namespace PlzGeo.Api.Services
 
             if (visualizationInfo.Type == VisualizationType.Group)
             {
-               var groupLegendItems = await _context.GroupLegendItems
-                    .Where(li => li.VisualizationId == id)
-                    .ProjectTo<GroupLegendItemDto>(_mapper.ConfigurationProvider)
-                    .ToListAsync();
+                var groupLegendItems = await _context.GroupLegendItems
+                     .Where(li => li.VisualizationId == id)
+                     .ProjectTo<GroupLegendItemDto>(_mapper.ConfigurationProvider)
+                     .ToListAsync();
                 return new GroupVisualizationDto()
-                {            
-                        Id = visualizationInfo.Id,
-                        Name = visualizationInfo.Name,
-                        Type = visualizationInfo.Type,
-                        Values = visualizationValues,
-                        Legend = groupLegendItems
-                    
+                {
+                    Id = visualizationInfo.Id,
+                    Name = visualizationInfo.Name,
+                    Type = visualizationInfo.Type,
+                    Values = visualizationValues,
+                    Legend = groupLegendItems
+
                 };
             }
             else
@@ -77,5 +77,115 @@ namespace PlzGeo.Api.Services
                 };
             }
         }
+
+
+        public async Task<VisualizationInfoDto> CreateHeatmapVisualization(Guid userId, CreateHeatmapVisualizationDto createDto)
+        {
+            var visualization = new Visualization
+            {
+                Id = Guid.NewGuid(),
+                UserId = userId,
+                Name = createDto.Name,
+                Type = VisualizationType.Heatmap.ToString()
+            };
+            _context.Visualizations.Add(visualization);
+
+            var postalCodes = createDto.Values
+                .Select(v => v.PostalCode)
+                .Distinct()
+                .ToList();
+
+            var postalAreas = await _context.PostalAreas
+                .Where(pa => postalCodes.Contains(pa.PostalCode))
+                .ToDictionaryAsync(pa => pa.PostalCode);
+
+            foreach (var value in createDto.Values)
+            {
+                var postalArea = postalAreas[value.PostalCode];
+
+                _context.VisualizationValues.Add(
+                    new VisualizationValue
+                    {
+                        VisualizationId = visualization.Id,
+                        PostalAreaId = postalArea.Id,
+                        Value = value.Value
+                    });
+            }
+
+            foreach (var item in createDto.Legend)
+            {
+                var legendItem = new HeatmapLegendItem
+                {
+                    Id = Guid.NewGuid(),
+                    VisualizationId = visualization.Id,
+                    Color = item.Color,
+                    FromValue = item.FromValue,
+                    ToValue = item.ToValue
+                };
+                _context.HeatmapLegendItems.Add(legendItem);
+            }
+
+            await _context.SaveChangesAsync();
+
+            return new VisualizationInfoDto
+            {
+                Id = visualization.Id,
+                Name = visualization.Name,
+                Type = VisualizationType.Heatmap
+            };
+
+        }
+
+
+        public async Task<VisualizationInfoDto> CreateGroupVisualization(Guid userId, CreateGroupVisualizationDto createDto)
+        {
+            var visualization = new Visualization
+            {
+                Id = Guid.NewGuid(),
+                UserId = userId,
+                Name = createDto.Name,
+                Type = VisualizationType.Group.ToString()
+            };
+            _context.Visualizations.Add(visualization);
+
+            var postalCodes = createDto.Values
+                .Select(v => v.PostalCode)
+                .Distinct()
+                .ToList();
+            var postalAreas = await _context.PostalAreas
+                .Where(pa => postalCodes.Contains(pa.PostalCode))
+                .ToDictionaryAsync(pa => pa.PostalCode);
+
+            foreach (var value in createDto.Values)
+            {
+                var postalArea = postalAreas[value.PostalCode];
+                _context.VisualizationValues.Add(
+                    new VisualizationValue
+                    {
+                        VisualizationId = visualization.Id,
+                        PostalAreaId = postalArea.Id,
+                        Value = value.Value
+                    });
+            }
+            foreach (var item in createDto.Legend)
+            {
+                var legendItem = new GroupLegendItem
+                {
+                    Id = Guid.NewGuid(),
+                    VisualizationId = visualization.Id,
+                    Color = item.Color,
+                    Name = item.Name
+                };
+                _context.GroupLegendItems.Add(legendItem);
+            }
+            await _context.SaveChangesAsync();
+            return new VisualizationInfoDto
+            {
+                Id = visualization.Id,
+                Name = visualization.Name,
+                Type = VisualizationType.Group
+            };
+        }
+
     }
 }
