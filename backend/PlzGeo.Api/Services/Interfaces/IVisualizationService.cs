@@ -4,6 +4,7 @@ namespace PlzGeo.Api.Services.Interfaces
 {
     public interface IVisualizationService
     {
-        Task<List<VisualizationSummaryDto>> GetVisualizationsAsync(Guid userId);
+        Task<List<VisualizationInfoDto>> GetVisualizations(Guid userId);
+        Task<VisualizationDto?> GetVisualizationById(Guid userId, Guid id);
     }
 }

@@ -4,6 +4,9 @@ using PlzGeo.Api.Models;
 using PlzGeo.Api.Profiles;
 using PlzGeo.Api.Services;
 using PlzGeo.Api.Services.Interfaces;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +21,12 @@ builder.Services.AddDbContext<PlzGisContext>(options =>
         builder.Configuration.GetConnectionString("Postgis")));
 builder.Services.AddAutoMapper(cfg => { }, typeof(MappingProfile));
 builder.Services.AddScoped<IVisualizationService, VisualizationService>();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(
+            new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+    });
 
 var app = builder.Build();
 

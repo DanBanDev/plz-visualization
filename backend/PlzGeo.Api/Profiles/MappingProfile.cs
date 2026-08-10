@@ -11,7 +11,19 @@ namespace PlzGeo.Api.Profiles
         {
             // Beispiel: Mapping von Source auf Destination (und umgekehrt mit ReverseMap)
             // CreateMap<SourceModel, DestinationDto>().ReverseMap();
-            CreateMap<Visualization, VisualizationSummaryDto>();
+            CreateMap<Visualization, VisualizationInfoDto>()
+                .ForMember(dest => dest.Type,
+                        opt => opt.MapFrom(src => Enum.Parse<VisualizationType>(src.Type)));
+
+            CreateMap<Visualization, GroupVisualizationDto>();
+
+            CreateMap<Visualization, HeatmapVisualizationDto>();
+
+            CreateMap<VisualizationValue, VisualizationValueDto>();
+
+            CreateMap<GroupLegendItem, GroupLegendItemDto>();
+
+            CreateMap<HeatmapLegendItem, HeatmapLegendItemDto>();
         }
 }
 }
