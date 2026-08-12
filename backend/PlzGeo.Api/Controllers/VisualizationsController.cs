@@ -81,5 +81,15 @@ namespace PlzGeo.Api.Controllers
             return Ok(visualizationInfo);
         }
 
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteVisualization(Guid id)
+        {
+            var userId = Guid.Parse("c369438e-5935-4273-8080-6ae7b4b61301");
+
+            await _visualizationService.DeleteVisualization(userId, id);
+
+            return new NoContentResult();
+        }
+
     }
 }

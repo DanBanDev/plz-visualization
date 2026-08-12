@@ -184,5 +184,21 @@ namespace PlzGeo.Api.Services
             return _mapper.Map<VisualizationInfoDto>(visualization);
         }
 
+        public async Task DeleteVisualization(Guid userId, Guid id)
+        {
+            var visualization = await _context.Visualizations
+                .FirstOrDefaultAsync(v => v.Id == id && v.UserId == userId);
+
+            if (visualization == null)
+            {
+                throw new ArgumentException(
+                        $"Visualization for id: '{id}' does not exist.");
+            }
+
+            _context.Visualizations.Remove(visualization);
+
+            await _context.SaveChangesAsync();
+        }
+
     }
 }

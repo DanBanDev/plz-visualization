@@ -1,4 +1,5 @@
-﻿using PlzGeo.Api.Dtos;
+﻿using Microsoft.AspNetCore.Mvc;
+using PlzGeo.Api.Dtos;
 
 namespace PlzGeo.Api.Services.Interfaces
 {
@@ -8,5 +9,6 @@ namespace PlzGeo.Api.Services.Interfaces
         Task<VisualizationDto?> GetVisualizationById(Guid userId, Guid id);
         Task<VisualizationInfoDto> CreateHeatmapVisualization(Guid userId, CreateHeatmapVisualizationDto createDto);
         Task<VisualizationInfoDto> CreateGroupVisualization(Guid userId, CreateGroupVisualizationDto createDto);
+        Task DeleteVisualization(Guid userId, Guid id);
     }
 }
