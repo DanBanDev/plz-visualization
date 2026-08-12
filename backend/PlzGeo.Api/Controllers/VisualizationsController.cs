@@ -59,7 +59,7 @@ namespace PlzGeo.Api.Controllers
             return Ok(heatmapDto);
         }
 
-        [HttpPost]
+        [HttpPost("heatmap")]
         public async Task<ActionResult<VisualizationInfoDto>> UploadHeatmapVisualization([FromBody] CreateHeatmapVisualizationDto createDto)
         {
             // Temporäre Test-UserId
@@ -70,7 +70,7 @@ namespace PlzGeo.Api.Controllers
             return Ok(visualizationInfo);
         }
 
-        [HttpPost]
+        [HttpPost("group")]
         public async Task<ActionResult<VisualizationInfoDto>> UploadGroupVisualization([FromBody] CreateGroupVisualizationDto createDto)
         {
             // Temporäre Test-UserId

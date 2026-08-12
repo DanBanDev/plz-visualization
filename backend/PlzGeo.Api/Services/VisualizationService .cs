@@ -27,6 +27,55 @@ namespace PlzGeo.Api.Services
                 .ToListAsync();
         }
 
+        private Visualization CreateVisualization(
+            Guid userId,
+            string name,
+            VisualizationType type)
+        {
+            var visualization = new Visualization
+            {
+                Id = Guid.NewGuid(),
+                UserId = userId,
+                Name = name,
+                Type = type.ToString()
+            };
+
+            _context.Visualizations.Add(visualization);
+
+            return visualization;
+        }
+
+        private async Task AddVisualizationValues(
+                Guid visualizationId,
+                List<VisualizationValueDto> values)
+        {
+            var postalCodes = values
+                .Select(v => v.PostalCode)
+                .Distinct()
+                .ToList();
+
+            var postalAreas = await _context.PostalAreas
+                .Where(pa => postalCodes.Contains(pa.PostalCode))
+                .ToDictionaryAsync(pa => pa.PostalCode);
+
+            foreach (var value in values)
+            {
+                if (!postalAreas.TryGetValue(value.PostalCode, out var postalArea))
+                {
+                    throw new ArgumentException(
+                        $"Postal code '{value.PostalCode}' does not exist.");
+                }
+
+                _context.VisualizationValues.Add(
+                    new VisualizationValue
+                    {
+                        VisualizationId = visualizationId,
+                        PostalAreaId = postalArea.Id,
+                        Value = value.Value
+                    });
+            }
+        }
+
 
         public async Task<VisualizationDto> GetVisualizationById(Guid userId, Guid id)
         {
@@ -81,36 +130,14 @@ namespace PlzGeo.Api.Services
 
         public async Task<VisualizationInfoDto> CreateHeatmapVisualization(Guid userId, CreateHeatmapVisualizationDto createDto)
         {
-            var visualization = new Visualization
-            {
-                Id = Guid.NewGuid(),
-                UserId = userId,
-                Name = createDto.Name,
-                Type = VisualizationType.Heatmap.ToString()
-            };
-            _context.Visualizations.Add(visualization);
+            var visualization = CreateVisualization(
+                userId,
+                createDto.Name,
+                VisualizationType.Heatmap);
 
-            var postalCodes = createDto.Values
-                .Select(v => v.PostalCode)
-                .Distinct()
-                .ToList();
-
-            var postalAreas = await _context.PostalAreas
-                .Where(pa => postalCodes.Contains(pa.PostalCode))
-                .ToDictionaryAsync(pa => pa.PostalCode);
-
-            foreach (var value in createDto.Values)
-            {
-                var postalArea = postalAreas[value.PostalCode];
-
-                _context.VisualizationValues.Add(
-                    new VisualizationValue
-                    {
-                        VisualizationId = visualization.Id,
-                        PostalAreaId = postalArea.Id,
-                        Value = value.Value
-                    });
-            }
+            await AddVisualizationValues(
+                visualization.Id,
+                createDto.Values);
 
             foreach (var item in createDto.Legend)
             {
@@ -127,46 +154,20 @@ namespace PlzGeo.Api.Services
 
             await _context.SaveChangesAsync();
 
-            return new VisualizationInfoDto
-            {
-                Id = visualization.Id,
-                Name = visualization.Name,
-                Type = VisualizationType.Heatmap
-            };
-
+            return _mapper.Map<VisualizationInfoDto>(visualization);
         }
 
 
         public async Task<VisualizationInfoDto> CreateGroupVisualization(Guid userId, CreateGroupVisualizationDto createDto)
         {
-            var visualization = new Visualization
-            {
-                Id = Guid.NewGuid(),
-                UserId = userId,
-                Name = createDto.Name,
-                Type = VisualizationType.Group.ToString()
-            };
-            _context.Visualizations.Add(visualization);
+            var visualization = CreateVisualization(
+                userId,
+                createDto.Name,
+                VisualizationType.Group);
 
-            var postalCodes = createDto.Values
-                .Select(v => v.PostalCode)
-                .Distinct()
-                .ToList();
-            var postalAreas = await _context.PostalAreas
-                .Where(pa => postalCodes.Contains(pa.PostalCode))
-                .ToDictionaryAsync(pa => pa.PostalCode);
-
-            foreach (var value in createDto.Values)
-            {
-                var postalArea = postalAreas[value.PostalCode];
-                _context.VisualizationValues.Add(
-                    new VisualizationValue
-                    {
-                        VisualizationId = visualization.Id,
-                        PostalAreaId = postalArea.Id,
-                        Value = value.Value
-                    });
-            }
+            await AddVisualizationValues(
+                visualization.Id,
+                createDto.Values);
             foreach (var item in createDto.Legend)
             {
                 var legendItem = new GroupLegendItem
@@ -179,12 +180,8 @@ namespace PlzGeo.Api.Services
                 _context.GroupLegendItems.Add(legendItem);
             }
             await _context.SaveChangesAsync();
-            return new VisualizationInfoDto
-            {
-                Id = visualization.Id,
-                Name = visualization.Name,
-                Type = VisualizationType.Group
-            };
+
+            return _mapper.Map<VisualizationInfoDto>(visualization);
         }
 
     }
