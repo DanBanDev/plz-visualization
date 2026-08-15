@@ -4,7 +4,6 @@ import { Component } from '@angular/core';
   selector: 'app-root',
   standalone: false,
   template: `
-  Hallo, 12355
     <app-map-page></app-map-page>
   `,
   styles: [`

@@ -5,6 +5,8 @@ import { MapPageModule } from './features/map-page/map-page.module';
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { AppRoutingModule } from './app-routing.module';
+import { appReducer } from './core/store/app.reducer';
+import { AppEffects } from './core/store/app.effects';
 
 
 @NgModule({
@@ -12,8 +14,8 @@ import { AppRoutingModule } from './app-routing.module';
   imports: [
         BrowserModule,
         AppRoutingModule,
-        StoreModule.forRoot({}),
-        EffectsModule.forRoot([]),
+        StoreModule.forRoot(appReducer),
+        EffectsModule.forRoot([AppEffects]),
         MapPageModule
     ],
   bootstrap: [AppComponent]

@@ -8,7 +8,13 @@ import { Component } from "@angular/core";
       <p>Header</p>
   `,
   styles: [`
-    
+        :host {
+      display: flex;
+      align-items: center;
+      padding-left: 1rem;
+      box-sizing: border-box;
+      border-bottom: 1px solid lightgray;
+    }
     `]
 })
 export class HeaderComponent {
