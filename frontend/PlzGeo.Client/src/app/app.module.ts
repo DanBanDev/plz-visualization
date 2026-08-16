@@ -5,6 +5,7 @@ import { MapPageModule } from './features/map-page/map-page.module';
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { AppRoutingModule } from './app-routing.module';
+import { provideHttpClient } from '@angular/common/http';
 import { appReducer } from './core/store/app.reducer';
 import { AppEffects } from './core/store/app.effects';
 
@@ -18,6 +19,9 @@ import { AppEffects } from './core/store/app.effects';
         EffectsModule.forRoot([AppEffects]),
         MapPageModule
     ],
+      providers: [
+    provideHttpClient()
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule {}
