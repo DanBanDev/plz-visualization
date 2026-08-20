@@ -8,7 +8,7 @@ import { EffectsModule } from '@ngrx/effects';
 import { AppRoutingModule } from './app-routing.module';
 import { provideHttpClient } from '@angular/common/http';
 import { appReducer } from './core/store/app.reducer';
-import { AppEffects } from './core/store/app.effects';
+import { AppEffects } from './core/store/effects/app.effects';
 
 
 @NgModule({

@@ -8,12 +8,22 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import {MatMenuModule} from '@angular/material/menu';
 import {MatButtonModule} from '@angular/material/button';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatDividerModule } from '@angular/material/divider';
+import { HeatmapUploadDialogComponent } from './dialogs/heatmap-upload-dialog.component';
 
 
 @NgModule({
-  declarations: [MapPageComponent, HeaderComponent, MapComponent],
+  declarations: [MapPageComponent, HeaderComponent, MapComponent, HeatmapUploadDialogComponent],
   imports: [
-    CommonModule, MatIconModule, MatFormFieldModule, MatInputModule, MatMenuModule, MatButtonModule
+        CommonModule,
+        MatIconModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatMenuModule,
+        MatButtonModule,
+        MatDialogModule,
+        MatDividerModule
   ],
   exports: [
     MapPageComponent

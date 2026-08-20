@@ -1,4 +1,6 @@
 import { Component } from "@angular/core";
+import { Store } from "@ngrx/store";
+import { openHeatmapUploadDialog } from "../../core/store/actions/open-heatmap-dialog.action";
 
 @Component({
   selector: 'app-header',
@@ -14,7 +16,7 @@ import { Component } from "@angular/core";
         <button mat-raised-button>Search</button>
       </div>
 
-      <button mat-raised-button>Heatmap Visualization</button>
+      <button mat-raised-button (click)="openHeatmapDialog()">Heatmap Visualization</button>
       <button mat-raised-button>Group Visualization</button>
       <div class="user-menu" [matMenuTriggerFor]="menu">
         <mat-label>MyUserName&#64;company.com</mat-label>
@@ -70,4 +72,14 @@ import { Component } from "@angular/core";
     `]
 })
 export class HeaderComponent {
+    constructor(
+    private readonly store: Store
+  ) {
+  }
+
+  openHeatmapDialog(): void {
+    this.store.dispatch(
+      openHeatmapUploadDialog()
+    );
+  }
 }
