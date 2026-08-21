@@ -154,24 +154,31 @@ CSV format:
 
 ```csv
 postal_code,value
-96450,100
-80331,250
-20095,150
+96450,100.2
+80331,250.8
+20095,150.7
+94315,120.4
 ```
+
+*First column values have always 5 digits (otherwise the row is ignored).
+*Second column values can also be decimal values.
 
 ### Workflow
 
-1. User clicks the Heatmap button.
+1. User clicks the "Select CSV File" button.
 2. File selection dialog opens.
 3. User selects a CSV file.
-4. CSV is parsed immediately.
+4. CSV is parsed immediately and file path is displayed right to the button.
 5. Distinct numeric values are analyzed.
-6. Values are distributed into intervals.
+6. Values are distributed into intervals and generate legend preview and text "X postcode values were read in." is displayed.
 
-The application generates:
 
-* Maximum 6 intervals
-* Minimum 1 interval
+Object from type create-heatmap-visualization.model is generated.
+
+The application generates legend preview (colors plus values) in dialog:
+
+* Maximum 6 intervals (legend rows)
+* Minimum 1 interval  (legend row)
 
 If the CSV contains fewer distinct values, fewer intervals are generated.
 
@@ -204,6 +211,7 @@ The application automatically generates a gradient.
 Whenever start or end color changes:
 
 * All legend preview colors update immediately.
+* Legend names or colors for heatmap preview cannot be edited (only color over color gradient).
 
 ### Upload Completion
 
@@ -229,18 +237,25 @@ CSV format:
 postal_code,value
 96450,1
 80331,2
-20095,1
+94315,2
+80334,1
+20095,3
+
 ```
 
 Equal values belong to the same group.
+*First column values have always 5 digits (otherwise the row is ignored).
+*If in the second column exists decimal values, position after decimal point is ignored.
 
 ### Workflow
 
-1. User clicks Group Visualization button.
+1. User clicks the "Select CSV File" button.
 2. File selection dialog opens.
 3. CSV is parsed immediately.
 4. Distinct group values are detected.
-5. Legend preview rows are generated.
+5. Legend preview rows are generated and text "X postcode values were read in." is displayed.
+
+Object from type create-group-visualization.model is generated.
 
 ### Group Limit
 
@@ -249,6 +264,8 @@ Maximum allowed groups:
 ```text
 100
 ```
+
+Set height for legend preview scrollable if needed.
 
 If more than 100 groups are detected:
 
@@ -261,6 +278,7 @@ Each generated row contains:
 
 * Color preview
 * Group value
+* Editable legend color (color picker)
 * Editable legend name
 
 Example:
@@ -289,12 +307,11 @@ Whenever start color or end color changes:
 
 * All preview colors are recalculated immediately.
 
-### Legend Name Editing
+### Preview Legend Name and Color Editing
 
 Before upload:
 
-* Every legend name may be edited.
-* Every legend color may be edited.
+* Legend preview for group visualization may be edited (color and name).
 
 ### Upload Completion
 
