@@ -5,13 +5,21 @@ import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
 import { catchError, map, mergeMap, tap } from 'rxjs/operators';
 import { openHeatmapUploadDialog } from '../actions/open-heatmap-dialog.action';
+import { openGroupUploadDialog } from '../actions/open-group-dialog.action';
 import {
   uploadHeatmapVisualization,
   uploadHeatmapVisualizationSuccess,
   uploadHeatmapVisualizationFailure,
   resetHeatmapUploadState
 } from '../actions/upload-heatmap-visualization.action';
+import {
+  uploadGroupVisualization,
+  uploadGroupVisualizationSuccess,
+  uploadGroupVisualizationFailure,
+  resetGroupUploadState
+} from '../actions/upload-group-visualization.action';
 import { HeatmapUploadDialogComponent } from '../../../features/map-page/dialogs/heatmap-upload-dialog.component';
+import { GroupUploadDialogComponent } from '../../../features/map-page/dialogs/group-upload-dialog.component';
 import { VisualizationApiClient } from '../../../api-clients/apis/visualization.api-client';
 
 
@@ -65,4 +73,48 @@ export class AppEffects {
     { dispatch: false }
   );
 
+  openGroupUploadDialog$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(openGroupUploadDialog),
+        tap(() => {
+          this.store.dispatch(resetGroupUploadState());
+
+          this.dialog.open(GroupUploadDialogComponent, {
+            width: '400px',
+            maxWidth: '90vw',
+            disableClose: true
+          });
+        })
+      ),
+    { dispatch: false }
+  );
+
+  uploadGroupVisualization$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(uploadGroupVisualization),
+        mergeMap(({ model }) =>
+          this.visualizationApiClient.createGroupVisualization(model).pipe(
+            map(visualization => uploadGroupVisualizationSuccess({ visualization })),
+            catchError(error =>
+              of(uploadGroupVisualizationFailure({
+                error: error?.error?.message ?? error?.message ?? 'Upload fehlgeschlagen'
+              }))
+            )
+          )
+        )
+      )
+  );
+
+  closeDialogOnGroupUploadSuccess$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(uploadGroupVisualizationSuccess),
+        tap(() => this.dialog.closeAll())
+      ),
+    { dispatch: false }
+  );
+
 }
+

@@ -1,6 +1,7 @@
 import { Component } from "@angular/core";
 import { Store } from "@ngrx/store";
 import { openHeatmapUploadDialog } from "../../core/store/actions/open-heatmap-dialog.action";
+import { openGroupUploadDialog } from "../../core/store/actions/open-group-dialog.action";
 
 @Component({
   selector: 'app-header',
@@ -17,7 +18,7 @@ import { openHeatmapUploadDialog } from "../../core/store/actions/open-heatmap-d
       </div>
 
       <button mat-raised-button (click)="openHeatmapDialog()">Heatmap Visualization</button>
-      <button mat-raised-button>Group Visualization</button>
+      <button mat-raised-button (click)="openGroupDialog()">Group Visualization</button>
       <div class="user-menu" [matMenuTriggerFor]="menu">
         <mat-label>MyUserName&#64;company.com</mat-label>
         <mat-icon class="menu-icon">account_circle</mat-icon>
@@ -80,6 +81,12 @@ export class HeaderComponent {
   openHeatmapDialog(): void {
     this.store.dispatch(
       openHeatmapUploadDialog()
+    );
+  }
+
+  openGroupDialog(): void {
+    this.store.dispatch(
+      openGroupUploadDialog()
     );
   }
 }

@@ -13,10 +13,11 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { HeatmapUploadDialogComponent } from './dialogs/heatmap-upload-dialog.component';
+import { GroupUploadDialogComponent } from './dialogs/group-upload-dialog.component';
 
 
 @NgModule({
-  declarations: [MapPageComponent, HeaderComponent, MapComponent, HeatmapUploadDialogComponent],
+  declarations: [MapPageComponent, HeaderComponent, MapComponent, HeatmapUploadDialogComponent, GroupUploadDialogComponent],
   imports: [
         CommonModule,
         FormsModule,
