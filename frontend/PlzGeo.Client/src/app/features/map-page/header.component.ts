@@ -25,11 +25,12 @@ import { VisualizationType } from "../../models/visualization-type.enum";
         <mat-label>MyUserName&#64;company.com</mat-label>
         <mat-icon class="menu-icon">account_circle</mat-icon>
       </div>
-        <mat-menu #menu="matMenu">
-          <button mat-menu-item [matMenuTriggerFor]="visualizationsMenu">My Visualizations</button>
+        <mat-menu #menu="matMenu" xPosition="before">
+          <button mat-menu-item class="reverse-arrow" [matMenuTriggerFor]="visualizationsMenu">My Visualizations</button>
+          <button mat-menu-item>Guidance</button>
           <button mat-menu-item>Log Out</button>
         </mat-menu>
-        <mat-menu #visualizationsMenu="matMenu">
+        <mat-menu #visualizationsMenu="matMenu" xPosition="before">
           <div class="visualizations-list">
             <div
               class="visualization-item"
@@ -73,6 +74,16 @@ import { VisualizationType } from "../../models/visualization-type.enum";
       .cdk-overlay-connected-position-bounding-box{
         align-items: end !important;
       }
+    }
+    .mat-mdc-menu-item {
+      text-align: center !important;
+    }
+    .reverse-arrow {
+      flex-direction: row-reverse;
+      justify-content: flex-end;
+    }
+    .reverse-arrow ::ng-deep .mat-mdc-menu-submenu-icon {
+      transform: rotate(180deg);
     }
     menu-icon {
       .mat-icon {
