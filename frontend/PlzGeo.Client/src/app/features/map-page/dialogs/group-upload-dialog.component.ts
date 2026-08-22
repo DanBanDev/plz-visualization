@@ -18,7 +18,10 @@ import { generateGroupLegend, MAX_GROUP_COUNT } from '../../../functions/generat
   selector: 'app-group-upload-dialog',
   standalone: false,
   template: `
-    <h2 mat-dialog-title>Upload Group Visualization</h2>
+    <div class="dialog-header">
+      <h2 mat-dialog-title>Upload Group Visualization</h2>
+      <button mat-icon-button class="close-button" mat-dialog-close>X</button>
+    </div>
 
     <mat-dialog-content class="dialog-content">
 
@@ -125,6 +128,17 @@ import { generateGroupLegend, MAX_GROUP_COUNT } from '../../../functions/generat
     </mat-dialog-actions>
   `,
   styles: [`
+    .dialog-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 395px;
+    }
+
+    .close-button {
+      border-radius: 50%;
+    }
+
     .dialog-content {
       display: flex;
       flex-direction: column;

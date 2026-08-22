@@ -18,7 +18,10 @@ import { generateHeatmapLegend } from '../../../functions/generate-heatmap-legen
   selector: 'app-heatmap-upload-dialog',
   standalone: false,
   template: `
-    <h2 mat-dialog-title>Upload Heatmap</h2>
+    <div class="dialog-header">
+      <h2 mat-dialog-title>Upload Heatmap</h2>
+      <button mat-icon-button class="close-button" mat-dialog-close>X</button>
+    </div>
 
     <mat-dialog-content class="dialog-content">
 
@@ -120,6 +123,17 @@ import { generateHeatmapLegend } from '../../../functions/generate-heatmap-legen
     </mat-dialog-actions>
   `,
   styles: [`
+    .dialog-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 395px;
+    }
+
+    .close-button {
+      border-radius: 50%;
+    }
+
     .dialog-content {
       display: flex;
       flex-direction: column;
