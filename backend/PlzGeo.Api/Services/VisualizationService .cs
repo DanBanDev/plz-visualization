@@ -174,6 +174,7 @@ namespace PlzGeo.Api.Services
                 {
                     Id = Guid.NewGuid(),
                     VisualizationId = visualization.Id,
+                    Value = item.Value,
                     Color = item.Color,
                     Name = item.Name
                 };
