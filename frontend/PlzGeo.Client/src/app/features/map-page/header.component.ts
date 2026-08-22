@@ -1,7 +1,9 @@
-import { Component } from "@angular/core";
+import { Component, Input } from "@angular/core";
 import { Store } from "@ngrx/store";
 import { openHeatmapUploadDialog } from "../../core/store/actions/open-heatmap-dialog.action";
 import { openGroupUploadDialog } from "../../core/store/actions/open-group-dialog.action";
+import { VisualizationInfo } from "../../models/visualization-info.model";
+import { VisualizationType } from "../../models/visualization-type.enum";
 
 @Component({
   selector: 'app-header',
@@ -24,8 +26,23 @@ import { openGroupUploadDialog } from "../../core/store/actions/open-group-dialo
         <mat-icon class="menu-icon">account_circle</mat-icon>
       </div>
         <mat-menu #menu="matMenu">
-          <button mat-menu-item>My Visualizations</button>
+          <button mat-menu-item [matMenuTriggerFor]="visualizationsMenu">My Visualizations</button>
           <button mat-menu-item>Log Out</button>
+        </mat-menu>
+        <mat-menu #visualizationsMenu="matMenu">
+          <div class="visualizations-list">
+            <div
+              class="visualization-item"
+              *ngFor="let visualization of visualizations"
+              (click)="onVisualizationClick(visualization)"
+            >
+              <span class="visualization-type">{{ visualization.type === visualizationType.Heatmap ? 'Heatmap' : 'Group' }}</span>
+              <span class="visualization-name">{{ visualization.name }}</span>
+            </div>
+            <div class="visualization-empty" *ngIf="!visualizations || visualizations.length === 0">
+              No visualizations
+            </div>
+          </div>
         </mat-menu>
     `,
   styles: [`
@@ -70,10 +87,41 @@ import { openGroupUploadDialog } from "../../core/store/actions/open-group-dialo
       align-items: center;
       gap: 5px;
     }
+    .visualizations-list {
+      max-height: 250px;
+      overflow-y: auto;
+      min-width: 200px;
+    }
+    .visualization-item {
+      display: flex;
+      flex-direction: column;
+      padding: 8px 16px;
+      cursor: pointer;
+    }
+    .visualization-item:hover {
+      background: rgba(0, 0, 0, 0.04);
+    }
+    .visualization-type {
+      font-size: 10px;
+      text-transform: uppercase;
+      color: grey;
+      opacity: 0.6;
+    }
+    .visualization-name {
+      font-size: 14px;
+    }
+    .visualization-empty {
+      padding: 8px 16px;
+      color: grey;
+    }
     `]
 })
 export class HeaderComponent {
-    constructor(
+  @Input() visualizations: VisualizationInfo[] | null = [];
+
+  readonly visualizationType = VisualizationType;
+
+  constructor(
     private readonly store: Store
   ) {
   }
@@ -88,5 +136,9 @@ export class HeaderComponent {
     this.store.dispatch(
       openGroupUploadDialog()
     );
+  }
+
+  onVisualizationClick(visualization: VisualizationInfo): void {
+    // no-op for now
   }
 }

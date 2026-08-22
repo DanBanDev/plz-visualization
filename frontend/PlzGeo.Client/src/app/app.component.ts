@@ -4,7 +4,7 @@ import { Component } from '@angular/core';
   selector: 'app-root',
   standalone: false,
   template: `
-    <app-map-page></app-map-page>
+    <router-outlet></router-outlet>
   `,
   styles: [`
     
