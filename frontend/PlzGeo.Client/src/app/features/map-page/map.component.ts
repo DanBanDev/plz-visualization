@@ -26,7 +26,25 @@ import { selectSelectedVisualization } from "../../core/store/visualizations/vis
   selector: 'app-map',
   standalone: false,
   template: `
-    <div #mapContainer class="map-container"></div>
+    <div class="map-shell">
+      <div #mapContainer class="map-container"></div>
+
+      <div class="map-legend" *ngIf="selectedVisualization">
+        <div class="legend-title">{{ selectedVisualization.name }}</div>
+        <div class="legend-subtitle">{{ mappedPostalCodeCount }} PLZ</div>
+
+        <div class="legend-container">
+          <div class="legend-row" *ngFor="let row of legendRows">
+            <div
+              class="legend-color"
+              [style.background]="row.color">
+            </div>
+
+            <span class="legend-text">{{ row.label }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
   `,
   styles: [`
     :host {
@@ -36,10 +54,77 @@ import { selectSelectedVisualization } from "../../core/store/visualizations/vis
       min-height: 300px;
     }
 
+    .map-shell {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      min-height: 300px;
+    }
+
     .map-container {
       width: 100%;
       height: 100%;
       min-height: 300px;
+    }
+
+    .map-legend {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      z-index: 1000;
+      min-width: 260px;
+      max-width: 360px;
+      max-height: calc(100% - 32px);
+      padding: 12px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(0, 0, 0, 0.12);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.14);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      overflow: hidden;
+    }
+
+    .legend-title {
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .legend-subtitle {
+      font-size: 12px;
+      opacity: 0.8;
+    }
+
+    .legend-container {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      overflow-y: auto;
+      max-height: 320px;
+      padding-right: 4px;
+    }
+
+    .legend-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-height: 24px;
+    }
+
+    .legend-color {
+      width: 24px;
+      height: 24px;
+      border-radius: 4px;
+      border: 1px solid rgba(0,0,0,0.2);
+      flex-shrink: 0;
+    }
+
+    .legend-text {
+      font-size: 13px;
+      line-height: 1.25;
     }
     `]
 })
@@ -57,7 +142,9 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   private readonly valueMap = new Map<string, number>();
   private readonly styleCache = new Map<string, Style>();
 
-  private selectedVisualization: Visualization | null = null;
+  selectedVisualization: Visualization | null = null;
+  legendRows: { color: string; label: string }[] = [];
+  mappedPostalCodeCount = 0;
 
   private readonly defaultStyle = new Style({
     stroke: new Stroke({
@@ -155,6 +242,8 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   private applyVisualization(visualization: Visualization | null): void {
     this.selectedVisualization = visualization;
     this.valueMap.clear();
+    this.legendRows = [];
+    this.mappedPostalCodeCount = 0;
 
     if (visualization) {
       for (const visualizationValue of visualization.values) {
@@ -164,9 +253,28 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
         this.valueMap.set(visualizationValue.postalCode, visualizationValue.value);
       }
+
+      this.mappedPostalCodeCount = this.valueMap.size;
+      this.legendRows = this.buildLegendRows(visualization);
     }
 
     this.vectorLayer?.changed();
+  }
+
+  private buildLegendRows(visualization: Visualization): { color: string; label: string }[] {
+    if (visualization.type === VisualizationType.Group) {
+      const groupVisualization = visualization as GroupVisualization;
+      return groupVisualization.legend.map(item => ({
+        color: this.withOpacity(item.color, 0.5),
+        label: `${item.value} - ${item.name}`
+      }));
+    }
+
+    const heatmapVisualization = visualization as HeatmapVisualization;
+    return heatmapVisualization.legend.map(item => ({
+      color: this.withOpacity(item.color, 0.5),
+      label: `Von ${item.fromValue} bis ${item.toValue}`
+    }));
   }
 
   private indexFeaturesByPostalCode(vectorSource: VectorSource): void {
