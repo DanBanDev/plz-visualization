@@ -1,5 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
@@ -23,6 +24,11 @@ import {
   selectVisualizationFailure,
   selectVisualizationSuccess
 } from '../actions/select-visualization.action';
+import {
+  deleteVisualization,
+  deleteVisualizationSuccess,
+  deleteVisualizationFailure
+} from '../actions/delete-visualization.action';
 import { HeatmapUploadDialogComponent } from '../../../features/map-page/dialogs/heatmap-upload-dialog.component';
 import { GroupUploadDialogComponent } from '../../../features/map-page/dialogs/group-upload-dialog.component';
 import { VisualizationApiClient } from '../../../api-clients/apis/visualization.api-client';
@@ -32,6 +38,7 @@ import { VisualizationApiClient } from '../../../api-clients/apis/visualization.
 export class AppEffects {
   private readonly actions$ = inject(Actions);
   private readonly dialog = inject(MatDialog);
+  private readonly snackBar = inject(MatSnackBar);
   private readonly store = inject(Store);
   private readonly visualizationApiClient = inject(VisualizationApiClient);
 
@@ -74,6 +81,17 @@ export class AppEffects {
       this.actions$.pipe(
         ofType(uploadHeatmapVisualizationSuccess),
         tap(() => this.dialog.closeAll())
+      ),
+    { dispatch: false }
+  );
+
+  showHeatmapUploadSuccessSnackbar$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(uploadHeatmapVisualizationSuccess),
+        tap(({ visualization }) =>
+          this.snackBar.open(`upload ${visualization.name} successful`, 'Close', { duration: 3000 })
+        )
       ),
     { dispatch: false }
   );
@@ -121,6 +139,17 @@ export class AppEffects {
     { dispatch: false }
   );
 
+  showGroupUploadSuccessSnackbar$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(uploadGroupVisualizationSuccess),
+        tap(({ visualization }) =>
+          this.snackBar.open(`upload ${visualization.name} successful`, 'Close', { duration: 3000 })
+        )
+      ),
+    { dispatch: false }
+  );
+
   selectVisualization$ = createEffect(
     () =>
       this.actions$.pipe(
@@ -136,6 +165,34 @@ export class AppEffects {
           )
         )
       )
+  );
+
+  deleteVisualization$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(deleteVisualization),
+        mergeMap(({ id, name }) =>
+          this.visualizationApiClient.deleteVisualization(id).pipe(
+            map(() => deleteVisualizationSuccess({ id, name })),
+            catchError(error =>
+              of(deleteVisualizationFailure({
+                error: error?.error?.message ?? error?.message ?? 'Visualisierung konnte nicht gelöscht werden'
+              }))
+            )
+          )
+        )
+      )
+  );
+
+  showDeleteSuccessSnackbar$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(deleteVisualizationSuccess),
+        tap(({ name }) =>
+          this.snackBar.open(`delete ${name} successful`, 'Close', { duration: 3000 })
+        )
+      ),
+    { dispatch: false }
   );
 
 }

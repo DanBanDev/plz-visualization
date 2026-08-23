@@ -7,6 +7,7 @@ import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { AppRoutingModule } from './app-routing.module';
 import { provideHttpClient } from '@angular/common/http';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { appReducer } from './core/store/app.reducer';
 import { AppEffects } from './core/store/effects/app.effects';
 
@@ -19,7 +20,8 @@ import { AppEffects } from './core/store/effects/app.effects';
         AppRoutingModule,
         StoreModule.forRoot(appReducer),
         EffectsModule.forRoot([AppEffects]),
-        MapPageModule
+        MapPageModule,
+        MatSnackBarModule
     ],
       providers: [
     provideHttpClient()

@@ -1,10 +1,13 @@
 import { Component, Input } from "@angular/core";
 import { Store } from "@ngrx/store";
+import { MatDialog } from "@angular/material/dialog";
 import { openHeatmapUploadDialog } from "../../core/store/actions/open-heatmap-dialog.action";
 import { openGroupUploadDialog } from "../../core/store/actions/open-group-dialog.action";
 import { selectVisualization } from "../../core/store/actions/select-visualization.action";
+import { deleteVisualization } from "../../core/store/actions/delete-visualization.action";
 import { VisualizationInfo } from "../../models/visualization-info.model";
 import { VisualizationType } from "../../models/visualization-type.enum";
+import { ConfirmDeleteDialogComponent } from "./dialogs/confirm-delete-dialog.component";
 
 @Component({
   selector: 'app-header',
@@ -38,8 +41,16 @@ import { VisualizationType } from "../../models/visualization-type.enum";
               *ngFor="let visualization of visualizations"
               (click)="onVisualizationClick(visualization)"
             >
-              <span class="visualization-type">{{ visualization.type === visualizationType.Heatmap ? 'Heatmap' : 'Group' }}</span>
-              <span class="visualization-name">{{ visualization.name }}</span>
+              <div class="visualization-labels">
+                <span class="visualization-type">{{ visualization.type === visualizationType.Heatmap ? 'Heatmap' : 'Group' }}</span>
+                <span class="visualization-name">{{ visualization.name }}</span>
+              </div>
+              <button
+                mat-icon-button
+                class="delete-button"
+                (click)="onDeleteClick($event, visualization)">
+                <mat-icon>close</mat-icon>
+              </button>
             </div>
             <div class="visualization-empty" *ngIf="!visualizations || visualizations.length === 0">
               No visualizations
@@ -106,12 +117,18 @@ import { VisualizationType } from "../../models/visualization-type.enum";
     }
     .visualization-item {
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
       padding: 8px 16px;
       cursor: pointer;
     }
     .visualization-item:hover {
       background: rgba(0, 0, 0, 0.04);
+    }
+    .visualization-labels {
+      display: flex;
+      flex-direction: column;
     }
     .visualization-type {
       font-size: 10px;
@@ -121,6 +138,17 @@ import { VisualizationType } from "../../models/visualization-type.enum";
     }
     .visualization-name {
       font-size: 14px;
+    }
+    .delete-button {
+      width: 24px;
+      height: 24px;
+      line-height: 24px;
+      flex-shrink: 0;
+    }
+    .delete-button .mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
     }
     .visualization-empty {
       padding: 8px 16px;
@@ -134,7 +162,8 @@ export class HeaderComponent {
   readonly visualizationType = VisualizationType;
 
   constructor(
-    private readonly store: Store
+    private readonly store: Store,
+    private readonly dialog: MatDialog
   ) {
   }
 
@@ -154,5 +183,22 @@ export class HeaderComponent {
     this.store.dispatch(
       selectVisualization({ id: visualization.id })
     );
+  }
+
+  onDeleteClick(event: MouseEvent, visualization: VisualizationInfo): void {
+    event.stopPropagation();
+
+    const dialogRef = this.dialog.open(ConfirmDeleteDialogComponent, {
+      width: '350px',
+      data: { name: visualization.name }
+    });
+
+    dialogRef.afterClosed().subscribe(confirmed => {
+      if (confirmed) {
+        this.store.dispatch(
+          deleteVisualization({ id: visualization.id, name: visualization.name })
+        );
+      }
+    });
   }
 }

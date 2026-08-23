@@ -6,6 +6,7 @@ import {
   selectVisualizationFailure,
   selectVisualizationSuccess
 } from '../actions/select-visualization.action';
+import { deleteVisualizationSuccess } from '../actions/delete-visualization.action';
 
 export const initialState: VisualizationsState = {
   items: [],
@@ -33,5 +34,10 @@ export const visualizationsReducer = createReducer(
     ...state,
     selectedVisualization: null,
     selectedVisualizationError: error
+  })),
+  on(deleteVisualizationSuccess, (state, { id }) => ({
+    ...state,
+    items: state.items.filter(item => item.id !== id),
+    selectedVisualization: state.selectedVisualization?.id === id ? null : state.selectedVisualization
   }))
 );
