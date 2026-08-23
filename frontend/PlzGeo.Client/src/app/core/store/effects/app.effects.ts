@@ -18,6 +18,11 @@ import {
   uploadGroupVisualizationFailure,
   resetGroupUploadState
 } from '../actions/upload-group-visualization.action';
+import {
+  selectVisualization,
+  selectVisualizationFailure,
+  selectVisualizationSuccess
+} from '../actions/select-visualization.action';
 import { HeatmapUploadDialogComponent } from '../../../features/map-page/dialogs/heatmap-upload-dialog.component';
 import { GroupUploadDialogComponent } from '../../../features/map-page/dialogs/group-upload-dialog.component';
 import { VisualizationApiClient } from '../../../api-clients/apis/visualization.api-client';
@@ -114,6 +119,23 @@ export class AppEffects {
         tap(() => this.dialog.closeAll())
       ),
     { dispatch: false }
+  );
+
+  selectVisualization$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(selectVisualization),
+        mergeMap(({ id }) =>
+          this.visualizationApiClient.getVisualization(id).pipe(
+            map(visualization => selectVisualizationSuccess({ visualization })),
+            catchError(error =>
+              of(selectVisualizationFailure({
+                error: error?.error?.message ?? error?.message ?? 'Visualisierung konnte nicht geladen werden'
+              }))
+            )
+          )
+        )
+      )
   );
 
 }

@@ -2,6 +2,7 @@ import { Component, Input } from "@angular/core";
 import { Store } from "@ngrx/store";
 import { openHeatmapUploadDialog } from "../../core/store/actions/open-heatmap-dialog.action";
 import { openGroupUploadDialog } from "../../core/store/actions/open-group-dialog.action";
+import { selectVisualization } from "../../core/store/actions/select-visualization.action";
 import { VisualizationInfo } from "../../models/visualization-info.model";
 import { VisualizationType } from "../../models/visualization-type.enum";
 
@@ -150,6 +151,8 @@ export class HeaderComponent {
   }
 
   onVisualizationClick(visualization: VisualizationInfo): void {
-    // no-op for now
+    this.store.dispatch(
+      selectVisualization({ id: visualization.id })
+    );
   }
 }

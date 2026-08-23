@@ -7,3 +7,8 @@ export const selectVisualizations = createSelector(
   selectVisualizationsState,
   (state: VisualizationsState) => state.items
 );
+
+export const selectSelectedVisualization = createSelector(
+  selectVisualizationsState,
+  (state: VisualizationsState) => state.selectedVisualization
+);
