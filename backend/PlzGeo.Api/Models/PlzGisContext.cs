@@ -205,7 +205,6 @@ public partial class PlzGisContext : DbContext
 
             entity.HasOne(d => d.Visualization).WithMany(p => p.VisualizationValues)
                 .HasForeignKey(d => d.VisualizationId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("visualization_values_visualization_id_fkey");
         });
 
