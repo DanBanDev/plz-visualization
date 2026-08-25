@@ -36,6 +36,5 @@ export class MapPageComponent {
     private readonly store: Store
   ) {
     this.visualizations$ = this.store.select(selectVisualizations);
-    console.log('MapPageComponent erstellt');
   }
 }

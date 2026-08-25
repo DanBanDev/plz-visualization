@@ -48,7 +48,7 @@ import { ConfirmDeleteDialogComponent } from "./dialogs/confirm-delete-dialog.co
               <button
                 mat-icon-button
                 class="delete-button"
-                matTooltip="Delete"
+                [matTooltip]="'Delete'"
                 (click)="onDeleteClick($event, visualization)">
                 <mat-icon>close</mat-icon>
               </button>
