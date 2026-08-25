@@ -9,7 +9,7 @@ export interface ConfirmDeleteDialogData {
   selector: 'app-confirm-delete-dialog',
   standalone: false,
   template: `
-    <h2 mat-dialog-title>Delete Visualization</h2>
+    <h2 mat-dialog-title>Delete Visualization?</h2>
 
     <mat-dialog-content>
       Are you sure you want to delete <strong>{{ data.name }}</strong>?

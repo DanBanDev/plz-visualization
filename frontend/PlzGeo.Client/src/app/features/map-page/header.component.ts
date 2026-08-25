@@ -48,6 +48,7 @@ import { ConfirmDeleteDialogComponent } from "./dialogs/confirm-delete-dialog.co
               <button
                 mat-icon-button
                 class="delete-button"
+                matTooltip="Delete"
                 (click)="onDeleteClick($event, visualization)">
                 <mat-icon>close</mat-icon>
               </button>
@@ -142,6 +143,8 @@ import { ConfirmDeleteDialogComponent } from "./dialogs/confirm-delete-dialog.co
     .delete-button {
       width: 24px;
       height: 24px;
+      margin-top: 15px;
+      padding: 0;
       line-height: 24px;
       flex-shrink: 0;
     }

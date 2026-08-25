@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { MapPageComponent } from './map-page.component';
 import { HeaderComponent } from './header.component';
 import { MapComponent } from './map.component';
@@ -29,7 +30,8 @@ import { ConfirmDeleteDialogComponent } from './dialogs/confirm-delete-dialog.co
         MatButtonModule,
         MatDialogModule,
         MatDividerModule,
-        MatProgressSpinnerModule
+        MatProgressSpinnerModule,
+        MatTooltipModule
   ],
   exports: [
     MapPageComponent

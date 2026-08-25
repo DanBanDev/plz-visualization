@@ -77,13 +77,13 @@ import { selectSelectedVisualization } from "../../core/store/visualizations/vis
       max-height: calc(100% - 32px);
       padding: 12px;
       border-radius: 10px;
-      background: rgba(255, 255, 255, 0.5);
+      background: rgba(255, 255, 255, 0.3);
       backdrop-filter: blur(8px);
       border: 1px solid rgba(0, 0, 0, 0.12);
       box-shadow: 0 6px 18px rgba(0, 0, 0, 0.14);
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 12px;
       overflow: hidden;
     }
 
@@ -266,7 +266,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       const groupVisualization = visualization as GroupVisualization;
       return groupVisualization.legend.map(item => ({
         color: this.withOpacity(item.color, 0.5),
-        label: `${item.value} - ${item.name}`
+        label: `${item.name}`
       }));
     }
 
