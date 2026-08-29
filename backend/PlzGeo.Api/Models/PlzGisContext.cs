@@ -1,10 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
 
 namespace PlzGeo.Api.Models;
 
-public partial class PlzGisContext : DbContext
+public partial class PlzGisContext : IdentityDbContext<ApplicationUser, ApplicationRole, Guid>
 {
     public PlzGisContext()
     {
@@ -23,8 +24,6 @@ public partial class PlzGisContext : DbContext
 
     public virtual DbSet<PostalArea> PostalAreas { get; set; }
 
-    public virtual DbSet<User> Users { get; set; }
-
     public virtual DbSet<Visualization> Visualizations { get; set; }
 
     public virtual DbSet<VisualizationValue> VisualizationValues { get; set; }
@@ -35,6 +34,8 @@ public partial class PlzGisContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
+
         modelBuilder
             .HasPostgresExtension("fuzzystrmatch")
             .HasPostgresExtension("postgis")
@@ -104,7 +105,7 @@ public partial class PlzGisContext : DbContext
                 .HasMaxLength(254)
                 .HasColumnName("boundary");
             entity.Property(e => e.Fid)
-                .HasPrecision(20)
+                .HasPrecision(20, 0)
                 .HasColumnName("fid");
             entity.Property(e => e.OsmId).HasColumnName("osm_id");
             entity.Property(e => e.Plz)
@@ -139,26 +140,6 @@ public partial class PlzGisContext : DbContext
                 .HasColumnName("postal_code");
         });
 
-        modelBuilder.Entity<User>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("users_pkey");
-
-            entity.ToTable("users");
-
-            entity.HasIndex(e => e.Email, "users_email_key").IsUnique();
-
-            entity.Property(e => e.Id)
-                .ValueGeneratedNever()
-                .HasColumnName("id");
-            entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("now()")
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("created_at");
-            entity.Property(e => e.Email)
-                .HasMaxLength(255)
-                .HasColumnName("email");
-            entity.Property(e => e.PasswordHash).HasColumnName("password_hash");
-        });
 
         modelBuilder.Entity<Visualization>(entity =>
         {

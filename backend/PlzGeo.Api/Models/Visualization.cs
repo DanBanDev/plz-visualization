@@ -19,7 +19,7 @@ public partial class Visualization
 
     public virtual ICollection<HeatmapLegendItem> HeatmapLegendItems { get; set; } = new List<HeatmapLegendItem>();
 
-    public virtual User User { get; set; } = null!;
+    public virtual ApplicationUser User { get; set; } = null!;
 
     public virtual ICollection<VisualizationValue> VisualizationValues { get; set; } = new List<VisualizationValue>();
 }

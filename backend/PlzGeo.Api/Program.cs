@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using PlzGeo.Api.Models;
 using PlzGeo.Api.Profiles;
@@ -19,6 +20,11 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<PlzGisContext>(options =>
     options.UseNpgsql(
         builder.Configuration.GetConnectionString("Postgis")));
+builder.Services
+    .AddIdentity<ApplicationUser, ApplicationRole>()
+    .AddEntityFrameworkStores<PlzGisContext>()
+    .AddDefaultTokenProviders();
+builder.Services.AddAuthentication();
 builder.Services.AddAutoMapper(cfg => { }, typeof(MappingProfile));
 builder.Services.AddScoped<IVisualizationService, VisualizationService>();
 builder.Services.AddControllers()
@@ -38,6 +44,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 
