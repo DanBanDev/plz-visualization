@@ -1,14 +1,17 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PlzGeo.Api.Dtos;
 using PlzGeo.Api.Models;
 using PlzGeo.Api.Services.Interfaces;
+using System.Security.Claims;
 
 namespace PlzGeo.Api.Controllers
 {
     [Route("api/visualizations")]
     [ApiController]
+    [Authorize]
     public class VisualizationsController : ControllerBase
     {
         private readonly IVisualizationService _visualizationService;
@@ -23,10 +26,16 @@ namespace PlzGeo.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<VisualizationInfoDto>>> Get()
+        public async Task<ActionResult<List<VisualizationInfoDto>>> GetVisualizationInfos()
         {
-            // Temporäre Test-UserId
-            var userId = Guid.Parse("c369438e-5935-4273-8080-6ae7b4b61301");
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim is null)
+            {
+                return Unauthorized();
+            }
+
+            var userId = Guid.Parse(userIdClaim);
 
             var visualizations =
                 await _visualizationService.GetVisualizations(userId);
@@ -37,8 +46,14 @@ namespace PlzGeo.Api.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<VisualizationDto>> GetVisualization(Guid id)
         {
-            // Temporäre Test-UserId
-            var userId = Guid.Parse("c369438e-5935-4273-8080-6ae7b4b61301");
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim is null)
+            {
+                return Unauthorized();
+            }
+
+            var userId = Guid.Parse(userIdClaim);
 
             var visualization = await _visualizationService.GetVisualizationById(userId, id);
 
@@ -62,8 +77,14 @@ namespace PlzGeo.Api.Controllers
         [HttpPost("heatmap")]
         public async Task<ActionResult<VisualizationInfoDto>> UploadHeatmapVisualization([FromBody] CreateHeatmapVisualizationDto createDto)
         {
-            // Temporäre Test-UserId
-            var userId = Guid.Parse("c369438e-5935-4273-8080-6ae7b4b61301");
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim is null)
+            {
+                return Unauthorized();
+            }
+
+            var userId = Guid.Parse(userIdClaim);
 
             var visualizationInfo = await _visualizationService.CreateHeatmapVisualization(userId, createDto);
 
@@ -73,8 +94,14 @@ namespace PlzGeo.Api.Controllers
         [HttpPost("group")]
         public async Task<ActionResult<VisualizationInfoDto>> UploadGroupVisualization([FromBody] CreateGroupVisualizationDto createDto)
         {
-            // Temporäre Test-UserId
-            var userId = Guid.Parse("c369438e-5935-4273-8080-6ae7b4b61301");
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim is null)
+            {
+                return Unauthorized();
+            }
+
+            var userId = Guid.Parse(userIdClaim);
 
             var visualizationInfo = await _visualizationService.CreateGroupVisualization(userId, createDto);
 
@@ -84,7 +111,14 @@ namespace PlzGeo.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteVisualization(Guid id)
         {
-            var userId = Guid.Parse("c369438e-5935-4273-8080-6ae7b4b61301");
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim is null)
+            {
+                return Unauthorized();
+            }
+
+            var userId = Guid.Parse(userIdClaim);
 
             await _visualizationService.DeleteVisualization(userId, id);
 
