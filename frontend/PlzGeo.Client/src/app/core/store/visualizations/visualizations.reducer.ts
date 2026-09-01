@@ -7,6 +7,7 @@ import {
   selectVisualizationSuccess
 } from '../actions/select-visualization.action';
 import { deleteVisualizationSuccess } from '../actions/delete-visualization.action';
+import { logoutSuccess } from '../auth/auth.actions';
 
 export const initialState: VisualizationsState = {
   items: [],
@@ -39,5 +40,8 @@ export const visualizationsReducer = createReducer(
     ...state,
     items: state.items.filter(item => item.id !== id),
     selectedVisualization: state.selectedVisualization?.id === id ? null : state.selectedVisualization
+  })),
+  on(logoutSuccess, () => ({
+    ...initialState
   }))
 );

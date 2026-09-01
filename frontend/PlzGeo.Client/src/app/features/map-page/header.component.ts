@@ -1,10 +1,14 @@
 import { Component, Input } from "@angular/core";
 import { Store } from "@ngrx/store";
 import { MatDialog } from "@angular/material/dialog";
+import { Observable } from "rxjs";
 import { openHeatmapUploadDialog } from "../../core/store/actions/open-heatmap-dialog.action";
 import { openGroupUploadDialog } from "../../core/store/actions/open-group-dialog.action";
 import { selectVisualization } from "../../core/store/actions/select-visualization.action";
 import { deleteVisualization } from "../../core/store/actions/delete-visualization.action";
+import { logout } from "../../core/store/auth/auth.actions";
+import { selectCurrentUser } from "../../core/store/auth/auth.selectors";
+import { User } from "../../models/user.model";
 import { VisualizationInfo } from "../../models/visualization-info.model";
 import { VisualizationType } from "../../models/visualization-type.enum";
 import { ConfirmDeleteDialogComponent } from "./dialogs/confirm-delete-dialog.component";
@@ -26,13 +30,13 @@ import { ConfirmDeleteDialogComponent } from "./dialogs/confirm-delete-dialog.co
       <button mat-raised-button (click)="openHeatmapDialog()">Heatmap Visualization</button>
       <button mat-raised-button (click)="openGroupDialog()">Group Visualization</button>
       <div class="user-menu" [matMenuTriggerFor]="menu">
-        <mat-label>MyUserName&#64;company.com</mat-label>
+        <mat-label>{{ (user$ | async)?.email || 'User' }}</mat-label>
         <mat-icon class="menu-icon">account_circle</mat-icon>
       </div>
         <mat-menu #menu="matMenu" xPosition="before">
           <button mat-menu-item class="reverse-arrow" [matMenuTriggerFor]="visualizationsMenu">My Visualizations</button>
           <button mat-menu-item>Guidance</button>
-          <button mat-menu-item>Log Out</button>
+          <button mat-menu-item (click)="onLogout()">Log Out</button>
         </mat-menu>
         <mat-menu #visualizationsMenu="matMenu" xPosition="before">
           <div class="visualizations-list">
@@ -163,11 +167,13 @@ export class HeaderComponent {
   @Input() visualizations: VisualizationInfo[] | null = [];
 
   readonly visualizationType = VisualizationType;
+  readonly user$: Observable<User | null>;
 
   constructor(
     private readonly store: Store,
     private readonly dialog: MatDialog
   ) {
+    this.user$ = this.store.select(selectCurrentUser);
   }
 
   openHeatmapDialog(): void {
@@ -203,5 +209,9 @@ export class HeaderComponent {
         );
       }
     });
+  }
+
+  onLogout(): void {
+    this.store.dispatch(logout());
   }
 }

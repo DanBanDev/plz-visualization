@@ -1,32 +1,41 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { Router } from '@angular/router';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { login } from '../../core/store/auth/auth.actions';
+import { register } from '../../core/store/auth/auth.actions';
 import { selectAuthError, selectAuthLoading, selectIsAuthenticated } from '../../core/store/auth/auth.selectors';
 
+function passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
+  const password = control.get('password')?.value;
+  const confirmPassword = control.get('confirmPassword')?.value;
+  if (password && confirmPassword && password !== confirmPassword) {
+    return { passwordMismatch: true };
+  }
+  return null;
+}
+
 @Component({
-  selector: 'app-login-page',
+  selector: 'app-register-page',
   standalone: false,
   template: `
     <div class="auth-container">
       <mat-card class="auth-card">
         <mat-card-header>
           <mat-card-title>PLZ Visualisierung</mat-card-title>
-          <mat-card-subtitle>Anmelden</mat-card-subtitle>
+          <mat-card-subtitle>Registrieren</mat-card-subtitle>
         </mat-card-header>
 
         <mat-card-content>
-          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+          <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>E-Mail</mat-label>
               <input matInput type="email" formControlName="email" placeholder="name@beispiel.de">
-              <mat-error *ngIf="loginForm.get('email')?.hasError('required')">
+              <mat-error *ngIf="registerForm.get('email')?.hasError('required')">
                 E-Mail ist erforderlich
               </mat-error>
-              <mat-error *ngIf="loginForm.get('email')?.hasError('email')">
+              <mat-error *ngIf="registerForm.get('email')?.hasError('email')">
                 Ungültige E-Mail-Adresse
               </mat-error>
             </mat-form-field>
@@ -34,8 +43,22 @@ import { selectAuthError, selectAuthLoading, selectIsAuthenticated } from '../..
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>Passwort</mat-label>
               <input matInput type="password" formControlName="password">
-              <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
+              <mat-error *ngIf="registerForm.get('password')?.hasError('required')">
                 Passwort ist erforderlich
+              </mat-error>
+              <mat-error *ngIf="registerForm.get('password')?.hasError('minlength')">
+                Passwort muss mindestens 6 Zeichen lang sein
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Passwort wiederholen</mat-label>
+              <input matInput type="password" formControlName="confirmPassword">
+              <mat-error *ngIf="registerForm.get('confirmPassword')?.hasError('required')">
+                Passwort-Bestätigung ist erforderlich
+              </mat-error>
+              <mat-error *ngIf="registerForm.hasError('passwordMismatch') && registerForm.get('confirmPassword')?.touched">
+                Passwörter stimmen nicht überein
               </mat-error>
             </mat-form-field>
 
@@ -48,8 +71,8 @@ import { selectAuthError, selectAuthLoading, selectIsAuthenticated } from '../..
                 mat-raised-button
                 color="primary"
                 type="submit"
-                [disabled]="loginForm.invalid || (loading$ | async)">
-                Anmelden
+                [disabled]="registerForm.invalid || (loading$ | async)">
+                Registrieren
               </button>
 
               <mat-spinner *ngIf="loading$ | async" diameter="28"></mat-spinner>
@@ -58,8 +81,8 @@ import { selectAuthError, selectAuthLoading, selectIsAuthenticated } from '../..
         </mat-card-content>
 
         <mat-card-footer class="auth-footer">
-          <span>Noch kein Konto?</span>
-          <a routerLink="/register">Hier registrieren</a>
+          <span>Bereits ein Konto?</span>
+          <a routerLink="/login">Hier anmelden</a>
         </mat-card-footer>
       </mat-card>
     </div>
@@ -124,9 +147,9 @@ import { selectAuthError, selectAuthLoading, selectIsAuthenticated } from '../..
     }
   `]
 })
-export class LoginPageComponent implements OnInit, OnDestroy {
+export class RegisterPageComponent implements OnInit, OnDestroy {
   private readonly destroy$ = new Subject<void>();
-  loginForm: FormGroup;
+  registerForm: FormGroup;
   loading$: Observable<boolean>;
   error$: Observable<string | null>;
 
@@ -135,10 +158,11 @@ export class LoginPageComponent implements OnInit, OnDestroy {
     private readonly store: Store,
     private readonly router: Router
   ) {
-    this.loginForm = this.fb.group({
+    this.registerForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required]]
-    });
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      confirmPassword: ['', [Validators.required]]
+    }, { validators: passwordMatchValidator });
 
     this.loading$ = this.store.select(selectAuthLoading);
     this.error$ = this.store.select(selectAuthError);
@@ -160,8 +184,9 @@ export class LoginPageComponent implements OnInit, OnDestroy {
   }
 
   onSubmit(): void {
-    if (this.loginForm.valid) {
-      this.store.dispatch(login({ request: this.loginForm.value }));
+    if (this.registerForm.valid) {
+      const { email, password } = this.registerForm.value;
+      this.store.dispatch(register({ request: { email, password } }));
     }
   }
 }
