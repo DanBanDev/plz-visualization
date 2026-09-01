@@ -21,6 +21,7 @@ import { GroupVisualization } from "../../models/group-visualization.model";
 import { HeatmapVisualization } from "../../models/heatmap-visualization.model";
 import { AppState } from "../../core/store/app-state";
 import { selectSelectedVisualization } from "../../core/store/visualizations/visualizations.selectors";
+import { selectShowOsmLayer, selectShowPlzLayer } from "../../core/store/map/map.selectors";
 
 @Component({
   selector: 'app-map',
@@ -135,8 +136,11 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   private mapContainer!: ElementRef<HTMLDivElement>;
 
   private map!: OLMap;
+  private osmLayer: TileLayer<OSM> | null = null;
   private vectorLayer: VectorLayer<VectorSource> | null = null;
   private baseStyleFunction: StyleFunction | undefined;
+  private showOsmLayer = true;
+  private showPlzLayer = true;
 
   private readonly featureMap = new Map<string, Feature<Geometry>>();
   private readonly valueMap = new Map<string, number>();
@@ -192,20 +196,41 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       return;
     }
 
-      this.map = new OLMap({
-        target: mapTarget,
-        layers: [
-          new TileLayer({
-            source: new OSM()
-          })
-        ],
-        view: new View({
-          center: [1113194, 6810000],
-          zoom: 10
-        })
-      });
+    this.osmLayer = new TileLayer({
+      source: new OSM(),
+      visible: this.showOsmLayer
+    });
+
+    this.map = new OLMap({
+      target: mapTarget,
+      layers: [
+        this.osmLayer
+      ],
+      view: new View({
+        center: [1113194, 6810000],
+        zoom: 10
+      })
+    });
 
     this.map.updateSize();
+
+    this.store.select(selectShowOsmLayer)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(showOsmLayer => {
+        this.showOsmLayer = showOsmLayer;
+        if (this.osmLayer) {
+          this.osmLayer.setVisible(showOsmLayer);
+        }
+      });
+
+    this.store.select(selectShowPlzLayer)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(showPlzLayer => {
+        this.showPlzLayer = showPlzLayer;
+        if (this.vectorLayer) {
+          this.vectorLayer.setVisible(showPlzLayer);
+        }
+      });
 
     this.store.select(selectSelectedVisualization)
       .pipe(takeUntil(this.destroy$))
@@ -225,6 +250,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       }
 
       this.vectorLayer = vectorLayer as VectorLayer<VectorSource>;
+      this.vectorLayer.setVisible(this.showPlzLayer);
       this.map?.addLayer(vectorLayer);
 
       if (this.selectedVisualization) {

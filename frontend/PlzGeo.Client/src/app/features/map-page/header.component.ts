@@ -12,6 +12,7 @@ import { User } from "../../models/user.model";
 import { VisualizationInfo } from "../../models/visualization-info.model";
 import { VisualizationType } from "../../models/visualization-type.enum";
 import { ConfirmDeleteDialogComponent } from "./dialogs/confirm-delete-dialog.component";
+import { LayersDialogComponent } from "./dialogs/layers-dialog.component";
 
 @Component({
   selector: 'app-header',
@@ -29,6 +30,7 @@ import { ConfirmDeleteDialogComponent } from "./dialogs/confirm-delete-dialog.co
 
       <button mat-raised-button (click)="openHeatmapDialog()">Heatmap Visualization</button>
       <button mat-raised-button (click)="openGroupDialog()">Group Visualization</button>
+      <button mat-raised-button (click)="openLayersDialog()">Layers</button>
       <div class="user-menu" [matMenuTriggerFor]="menu">
         <mat-label>{{ (user$ | async)?.email || 'User' }}</mat-label>
         <mat-icon class="menu-icon">account_circle</mat-icon>
@@ -190,6 +192,12 @@ export class HeaderComponent {
     this.store.dispatch(
       openGroupUploadDialog()
     );
+  }
+
+  openLayersDialog(): void {
+    this.dialog.open(LayersDialogComponent, {
+      width: '320px'
+    });
   }
 
   onVisualizationClick(visualization: VisualizationInfo): void {

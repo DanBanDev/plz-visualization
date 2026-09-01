@@ -13,13 +13,15 @@ import {MatButtonModule} from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { HeatmapUploadDialogComponent } from './dialogs/heatmap-upload-dialog.component';
 import { GroupUploadDialogComponent } from './dialogs/group-upload-dialog.component';
 import { ConfirmDeleteDialogComponent } from './dialogs/confirm-delete-dialog.component';
+import { LayersDialogComponent } from './dialogs/layers-dialog.component';
 
 
 @NgModule({
-  declarations: [MapPageComponent, HeaderComponent, MapComponent, HeatmapUploadDialogComponent, GroupUploadDialogComponent, ConfirmDeleteDialogComponent],
+  declarations: [MapPageComponent, HeaderComponent, MapComponent, HeatmapUploadDialogComponent, GroupUploadDialogComponent, ConfirmDeleteDialogComponent, LayersDialogComponent],
   imports: [
         CommonModule,
         FormsModule,
@@ -31,7 +33,8 @@ import { ConfirmDeleteDialogComponent } from './dialogs/confirm-delete-dialog.co
         MatDialogModule,
         MatDividerModule,
         MatProgressSpinnerModule,
-        MatTooltipModule
+        MatTooltipModule,
+        MatCheckboxModule
   ],
   exports: [
     MapPageComponent

@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { MapPageComponent } from './map-page.component';
+import { MapPageComponent } from '../map-page.component';
 
 describe('MapPageComponent', () => {
   let component: MapPageComponent;
