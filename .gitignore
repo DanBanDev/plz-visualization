@@ -50,9 +50,6 @@ appsettings.*.Development.json
 [Uu]ser[Ss]ecrets/
 secrets.json
 
-# Development-Secrets
-appsettings.Development.json
-
 
 ########################################
 # GIS data
