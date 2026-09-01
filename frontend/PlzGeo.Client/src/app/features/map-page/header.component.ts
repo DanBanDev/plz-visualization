@@ -18,7 +18,7 @@ import { ConfirmDeleteDialogComponent } from "./dialogs/confirm-delete-dialog.co
   standalone: false,
   template: `
       
-      <mat-icon>map_search</mat-icon>
+      <img src="zip-app-logo.png" alt="ZIP App Logo" class="header-logo">
       <div class="search-container">
         <mat-form-field class="example-full-width">
           <mat-label>Postal Code</mat-label>
@@ -71,6 +71,10 @@ import { ConfirmDeleteDialogComponent } from "./dialogs/confirm-delete-dialog.co
       justify-content: space-between;
       background: #ebebeb;
       height: 60px;
+    }
+    .header-logo {
+      height: 40px;
+      margin-left: 10px;
     }
     .user-menu {
       display: flex;
