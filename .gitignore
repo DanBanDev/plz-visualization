@@ -47,7 +47,11 @@ appsettings.Development.json
 appsettings.*.Development.json
 
 # User secrets
+[Uu]ser[Ss]ecrets/
 secrets.json
+
+# Development-Secrets
+appsettings.Development.json
 
 
 ########################################
