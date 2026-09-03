@@ -183,7 +183,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
     const color = this.getColorForValue(value, this.selectedVisualization);
 
-    return this.getStyle(color);
+    return this.getStyle(color, this.showPlzLayer);
   };
 
   constructor(
@@ -247,9 +247,8 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(showPlzLayer => {
         this.showPlzLayer = showPlzLayer;
-        if (this.vectorLayer) {
-          this.vectorLayer.setVisible(showPlzLayer);
-        }
+        this.updatePlzLayerVisibility();
+        this.vectorLayer?.changed();
       });
 
     this.store.select(selectShowFederalStateBoundariesLayer)
@@ -279,7 +278,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       }
 
       this.vectorLayer = vectorLayer as VectorLayer<VectorSource>;
-      this.vectorLayer.setVisible(this.showPlzLayer);
+      this.updatePlzLayerVisibility();
       this.vectorLayer.setZIndex(1);
       this.map?.addLayer(vectorLayer);
 
@@ -314,6 +313,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       this.legendRows = this.buildLegendRows(visualization);
     }
 
+    this.updatePlzLayerVisibility();
     this.vectorLayer?.changed();
   }
 
@@ -369,19 +369,20 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     return this.withOpacity(legendItem?.color ?? '#eeeeee', 0.5);
   }
 
-  private getStyle(color: string): Style {
-    let style = this.styleCache.get(color);
+  private getStyle(color: string, showStroke: boolean): Style {
+    const styleCacheKey = `${color}-${showStroke}`;
+    let style = this.styleCache.get(styleCacheKey);
 
     if (!style) {
       style = new Style({
         fill: new Fill({ color }),
-        stroke: new Stroke({
+        stroke: showStroke ? new Stroke({
           color: '#666',
           width: 1
-        })
+        }) : undefined
       });
 
-      this.styleCache.set(color, style);
+      this.styleCache.set(styleCacheKey, style);
     }
 
     return style;
@@ -427,6 +428,10 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     }
 
     return this.defaultStyle;
+  }
+
+  private updatePlzLayerVisibility(): void {
+    this.vectorLayer?.setVisible(this.showPlzLayer || this.selectedVisualization !== null);
   }
 }
 

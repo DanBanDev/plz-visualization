@@ -1,7 +1,6 @@
 import { createReducer, on } from '@ngrx/store';
 import { MapState } from './map-state';
 import { setLayerVisibility } from '../actions/set-layer-visibility.action';
-import { selectVisualization, selectVisualizationSuccess } from '../actions/select-visualization.action';
 
 export const initialState: MapState = {
   selectedPostalCode: null,
@@ -17,9 +16,5 @@ export const mapReducer = createReducer(
     showOsmLayer,
     showPlzLayer,
     showFederalStateBoundariesLayer
-  })),
-  on(selectVisualization, selectVisualizationSuccess, (state) => ({
-    ...state,
-    showPlzLayer: true
   }))
 );
