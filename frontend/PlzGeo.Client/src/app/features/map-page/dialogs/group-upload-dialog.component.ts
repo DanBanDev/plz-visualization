@@ -136,7 +136,11 @@ import { generateGroupLegend, MAX_GROUP_COUNT } from '../../../functions/generat
     }
 
     .close-button {
-      border-radius: 50%;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
     }
 
     .dialog-content {

@@ -131,7 +131,11 @@ import { generateHeatmapLegend } from '../../../functions/generate-heatmap-legen
     }
 
     .close-button {
-      border-radius: 50%;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
     }
 
     .dialog-content {

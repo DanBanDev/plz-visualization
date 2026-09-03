@@ -4,7 +4,7 @@ import { Store } from '@ngrx/store';
 import { take } from 'rxjs/operators';
 import { AppState } from '../../../core/store/app-state';
 import { setLayerVisibility } from '../../../core/store/actions/set-layer-visibility.action';
-import { selectShowOsmLayer, selectShowPlzLayer } from '../../../core/store/map/map.selectors';
+import { selectShowFederalStateBoundariesLayer, selectShowOsmLayer, selectShowPlzLayer } from '../../../core/store/map/map.selectors';
 
 @Component({
   selector: 'app-layers-dialog',
@@ -22,6 +22,9 @@ import { selectShowOsmLayer, selectShowPlzLayer } from '../../../core/store/map/
         </mat-checkbox>
         <mat-checkbox [(ngModel)]="showPlzLayer">
           PLZ-Layer
+        </mat-checkbox>
+        <mat-checkbox [(ngModel)]="showFederalStateBoundariesLayer">
+          Bundesländer-Grenzen
         </mat-checkbox>
       </div>
     </mat-dialog-content>
@@ -60,6 +63,7 @@ import { selectShowOsmLayer, selectShowPlzLayer } from '../../../core/store/map/
 export class LayersDialogComponent implements OnInit {
   showOsmLayer = true;
   showPlzLayer = true;
+  showFederalStateBoundariesLayer = true;
 
   constructor(
     private readonly store: Store<AppState>,
@@ -73,12 +77,16 @@ export class LayersDialogComponent implements OnInit {
     this.store.select(selectShowPlzLayer).pipe(take(1)).subscribe(show => {
       this.showPlzLayer = show;
     });
+    this.store.select(selectShowFederalStateBoundariesLayer).pipe(take(1)).subscribe(show => {
+      this.showFederalStateBoundariesLayer = show;
+    });
   }
 
   onOk(): void {
     this.store.dispatch(setLayerVisibility({
       showOsmLayer: this.showOsmLayer,
-      showPlzLayer: this.showPlzLayer
+      showPlzLayer: this.showPlzLayer,
+      showFederalStateBoundariesLayer: this.showFederalStateBoundariesLayer
     }));
     this.dialogRef.close();
   }
