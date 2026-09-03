@@ -6,6 +6,7 @@ import Feature, { type FeatureLike } from 'ol/Feature';
 import type Geometry from 'ol/geom/Geometry';
 import TileLayer from 'ol/layer/Tile';
 import VectorLayer from 'ol/layer/Vector';
+import GeoJSON from 'ol/format/GeoJSON';
 import OSM from 'ol/source/OSM';
 import VectorSource from 'ol/source/Vector';
 import Fill from 'ol/style/Fill';
@@ -21,7 +22,7 @@ import { GroupVisualization } from "../../models/group-visualization.model";
 import { HeatmapVisualization } from "../../models/heatmap-visualization.model";
 import { AppState } from "../../core/store/app-state";
 import { selectSelectedVisualization } from "../../core/store/visualizations/visualizations.selectors";
-import { selectShowOsmLayer, selectShowPlzLayer } from "../../core/store/map/map.selectors";
+import { selectShowFederalStateBoundariesLayer, selectShowOsmLayer, selectShowPlzLayer } from "../../core/store/map/map.selectors";
 
 @Component({
   selector: 'app-map',
@@ -138,9 +139,11 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   private map!: OLMap;
   private osmLayer: TileLayer<OSM> | null = null;
   private vectorLayer: VectorLayer<VectorSource> | null = null;
+  private federalStateBoundariesLayer: VectorLayer<VectorSource> | null = null;
   private baseStyleFunction: StyleFunction | undefined;
   private showOsmLayer = true;
   private showPlzLayer = true;
+  private showFederalStateBoundariesLayer = true;
 
   private readonly featureMap = new Map<string, Feature<Geometry>>();
   private readonly valueMap = new Map<string, number>();
@@ -198,13 +201,30 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
     this.osmLayer = new TileLayer({
       source: new OSM(),
-      visible: this.showOsmLayer
+      visible: this.showOsmLayer,
+      zIndex: 0
+    });
+
+    this.federalStateBoundariesLayer = new VectorLayer({
+      source: new VectorSource({
+        url: 'federal-layer-bounderies-de.geojson',
+        format: new GeoJSON()
+      }),
+      style: new Style({
+        stroke: new Stroke({
+          color: '#11788b',
+          width: 2
+        })
+      }),
+      visible: this.showFederalStateBoundariesLayer,
+      zIndex: 2
     });
 
     this.map = new OLMap({
       target: mapTarget,
       layers: [
-        this.osmLayer
+        this.osmLayer,
+        this.federalStateBoundariesLayer
       ],
       view: new View({
         center: [1113194, 6810000],
@@ -232,6 +252,15 @@ export class MapComponent implements AfterViewInit, OnDestroy {
         }
       });
 
+    this.store.select(selectShowFederalStateBoundariesLayer)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(showFederalStateBoundariesLayer => {
+        this.showFederalStateBoundariesLayer = showFederalStateBoundariesLayer;
+        if (this.federalStateBoundariesLayer) {
+          this.federalStateBoundariesLayer.setVisible(showFederalStateBoundariesLayer);
+        }
+      });
+
     this.store.select(selectSelectedVisualization)
       .pipe(takeUntil(this.destroy$))
       .subscribe(visualization => {
@@ -251,6 +280,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
       this.vectorLayer = vectorLayer as VectorLayer<VectorSource>;
       this.vectorLayer.setVisible(this.showPlzLayer);
+      this.vectorLayer.setZIndex(1);
       this.map?.addLayer(vectorLayer);
 
       if (this.selectedVisualization) {

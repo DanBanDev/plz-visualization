@@ -6,15 +6,17 @@ import { selectVisualization, selectVisualizationSuccess } from '../actions/sele
 export const initialState: MapState = {
   selectedPostalCode: null,
   showOsmLayer: true,
-  showPlzLayer: true
+  showPlzLayer: true,
+  showFederalStateBoundariesLayer: true
 };
 
 export const mapReducer = createReducer(
   initialState,
-  on(setLayerVisibility, (state, { showOsmLayer, showPlzLayer }) => ({
+  on(setLayerVisibility, (state, { showOsmLayer, showPlzLayer, showFederalStateBoundariesLayer }) => ({
     ...state,
     showOsmLayer,
-    showPlzLayer
+    showPlzLayer,
+    showFederalStateBoundariesLayer
   })),
   on(selectVisualization, selectVisualizationSuccess, (state) => ({
     ...state,

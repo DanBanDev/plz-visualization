@@ -5,4 +5,5 @@ export interface MapState {
   selectedPostalCode: string | null;
   showOsmLayer: boolean;
   showPlzLayer: boolean;
+  showFederalStateBoundariesLayer: boolean;
 }

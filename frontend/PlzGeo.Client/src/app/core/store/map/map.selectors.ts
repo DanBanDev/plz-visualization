@@ -12,3 +12,8 @@ export const selectShowPlzLayer = createSelector(
   selectMapState,
   (state: MapState) => state.showPlzLayer
 );
+
+export const selectShowFederalStateBoundariesLayer = createSelector(
+  selectMapState,
+  (state: MapState) => state.showFederalStateBoundariesLayer
+);
