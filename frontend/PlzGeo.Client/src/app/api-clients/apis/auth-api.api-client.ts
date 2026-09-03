@@ -1,11 +1,15 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { Observable } from "rxjs";
+import { map, Observable } from "rxjs";
 import { LoginRequest } from "../../models/login-request.model";
 import { RegisterRequest } from "../../models/register-request.model";
 import { User } from "../../models/user.model";
 
 const baseUrl = '/api/auth';
+
+interface AuthResponse {
+  user: User;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -17,11 +21,15 @@ export class AuthApiClient {
   ) {}
 
   login(request: LoginRequest): Observable<User> {
-    return this.http.post<User>(`${baseUrl}/login`, request, { withCredentials: true });
+    return this.http
+      .post<AuthResponse>(`${baseUrl}/login`, request, { withCredentials: true })
+      .pipe(map(response => response.user));
   }
 
   register(request: RegisterRequest): Observable<User> {
-    return this.http.post<User>(`${baseUrl}/register`, request, { withCredentials: true });
+    return this.http
+      .post<AuthResponse>(`${baseUrl}/register`, request, { withCredentials: true })
+      .pipe(map(response => response.user));
   }
 
   logout(): Observable<void> {
@@ -29,7 +37,9 @@ export class AuthApiClient {
   }
 
   getCurrentUser(): Observable<User> {
-    return this.http.get<User>(`${baseUrl}/me`, { withCredentials: true });
+    return this.http
+      .get<AuthResponse>(`${baseUrl}/me`, { withCredentials: true })
+      .pipe(map(response => response.user));
   }
 
 }
