@@ -148,6 +148,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   private readonly featureMap = new Map<string, Feature<Geometry>>();
   private readonly valueMap = new Map<string, number>();
   private readonly styleCache = new Map<string, Style>();
+  private readonly strokeHiddenStyleCache = new WeakMap<Style, Style>();
 
   selectedVisualization: Visualization | null = null;
   legendRows: { color: string; label: string }[] = [];
@@ -424,14 +425,30 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     const baseStyle = this.baseStyleFunction?.(feature, resolution);
 
     if (baseStyle) {
-      return baseStyle;
+      return this.showPlzLayer ? baseStyle : this.withoutStroke(baseStyle);
     }
 
-    return this.defaultStyle;
+    return this.showPlzLayer ? this.defaultStyle : this.withoutStroke(this.defaultStyle);
   }
 
   private updatePlzLayerVisibility(): void {
-    this.vectorLayer?.setVisible(this.showPlzLayer || this.selectedVisualization !== null);
+    this.vectorLayer?.setVisible(true);
+  }
+
+  private withoutStroke(style: Style | Style[]): Style | Style[] {
+    if (Array.isArray(style)) {
+      return style.map(item => this.withoutStroke(item) as Style);
+    }
+
+    let strokeHiddenStyle = this.strokeHiddenStyleCache.get(style);
+
+    if (!strokeHiddenStyle) {
+      strokeHiddenStyle = style.clone();
+      strokeHiddenStyle.setStroke(null);
+      this.strokeHiddenStyleCache.set(style, strokeHiddenStyle);
+    }
+
+    return strokeHiddenStyle;
   }
 }
 
