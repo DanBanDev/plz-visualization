@@ -2,6 +2,7 @@ import { createReducer, on } from '@ngrx/store';
 import { VisualizationsState } from './visualizations-state';
 import { loadVisualizationsSuccess } from '../actions/load-visualizations.action';
 import {
+  clearSelectedVisualization,
   selectVisualization,
   selectVisualizationFailure,
   selectVisualizationSuccess
@@ -12,7 +13,8 @@ import { logoutSuccess } from '../auth/auth.actions';
 export const initialState: VisualizationsState = {
   items: [],
   selectedVisualization: null,
-  selectedVisualizationError: null
+  selectedVisualizationError: null,
+  isLoadingSelectedVisualization: false
 };
 
 export const visualizationsReducer = createReducer(
@@ -24,17 +26,26 @@ export const visualizationsReducer = createReducer(
   on(selectVisualization, state => ({
     ...state,
     selectedVisualization: null,
-    selectedVisualizationError: null
+    selectedVisualizationError: null,
+    isLoadingSelectedVisualization: true
   })),
   on(selectVisualizationSuccess, (state, { visualization }) => ({
     ...state,
     selectedVisualization: visualization,
-    selectedVisualizationError: null
+    selectedVisualizationError: null,
+    isLoadingSelectedVisualization: false
   })),
   on(selectVisualizationFailure, (state, { error }) => ({
     ...state,
     selectedVisualization: null,
-    selectedVisualizationError: error
+    selectedVisualizationError: error,
+    isLoadingSelectedVisualization: false
+  })),
+  on(clearSelectedVisualization, state => ({
+    ...state,
+    selectedVisualization: null,
+    selectedVisualizationError: null,
+    isLoadingSelectedVisualization: false
   })),
   on(deleteVisualizationSuccess, (state, { id }) => ({
     ...state,

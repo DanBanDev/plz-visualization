@@ -5,4 +5,5 @@ export interface VisualizationsState {
   items: VisualizationInfo[];
   selectedVisualization: Visualization | null;
   selectedVisualizationError: string | null;
+  isLoadingSelectedVisualization: boolean;
 }

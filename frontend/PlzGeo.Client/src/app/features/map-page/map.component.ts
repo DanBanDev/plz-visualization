@@ -22,8 +22,12 @@ import { VisualizationType } from "../../models/visualization-type.enum";
 import { GroupVisualization } from "../../models/group-visualization.model";
 import { HeatmapVisualization } from "../../models/heatmap-visualization.model";
 import { AppState } from "../../core/store/app-state";
-import { selectSelectedVisualization } from "../../core/store/visualizations/visualizations.selectors";
+import { selectIsLoadingSelectedVisualization, selectSelectedVisualization } from "../../core/store/visualizations/visualizations.selectors";
 import { selectShowFederalStateBoundariesLayer, selectShowOsmLayer, selectShowPlzLayer } from "../../core/store/map/map.selectors";
+import { defaultStylePostalLayer } from "../../constants/default-style-postal-layer.constant";
+import { federalBoundariesLayerStyle } from "../../constants/federal-boundaries-layer-style.constant";
+import { defaultOlMapView } from "../../constants/default-ol-map-view.constant";
+import { postalCodeHighlightLayerStyle } from "../../constants/postal-code-highlight-layer-style.constant";
 
 @Component({
   selector: 'app-map',
@@ -31,6 +35,10 @@ import { selectShowFederalStateBoundariesLayer, selectShowOsmLayer, selectShowPl
   template: `
     <div class="map-shell">
       <div #mapContainer class="map-container"></div>
+
+      <div class="map-loading-overlay" *ngIf="isLoadingVisualization">
+        <mat-spinner diameter="44"></mat-spinner>
+      </div>
 
       <div class="map-legend" *ngIf="selectedVisualization">
         <div class="legend-title">{{ selectedVisualization.name }}</div>
@@ -68,6 +76,15 @@ import { selectShowFederalStateBoundariesLayer, selectShowOsmLayer, selectShowPl
       width: 100%;
       height: 100%;
       min-height: 300px;
+    }
+
+    .map-loading-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 1001;
+      display: grid;
+      place-items: center;
+      pointer-events: none;
     }
 
     .map-legend {
@@ -153,15 +170,10 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   private readonly strokeHiddenStyleCache = new WeakMap<Style, Style>();
 
   selectedVisualization: Visualization | null = null;
+  isLoadingVisualization = false;
   legendRows: { color: string; label: string }[] = [];
   mappedPostalCodeCount = 0;
 
-  private readonly defaultStyle = new Style({
-    stroke: new Stroke({
-      color: '#666',
-      width: 1
-    })
-  });
 
   private readonly vectorStyleFunction: StyleFunction = (feature, resolution) => {
     if (!this.selectedVisualization) {
@@ -213,12 +225,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
         url: 'federal-layer-bounderies-de.geojson',
         format: new GeoJSON()
       }),
-      style: new Style({
-        stroke: new Stroke({
-          color: '#11788b',
-          width: 2
-        })
-      }),
+      style: federalBoundariesLayerStyle,
       visible: this.showFederalStateBoundariesLayer,
       zIndex: 2
     });
@@ -229,20 +236,12 @@ export class MapComponent implements AfterViewInit, OnDestroy {
         this.osmLayer,
         this.federalStateBoundariesLayer
       ],
-      view: new View({
-        center: [1113194, 6810000],
-        zoom: 7
-      })
+      view: defaultOlMapView
     });
 
     this.postalCodeHighlightLayer = new VectorLayer({
       source: new VectorSource(),
-      style: new Style({
-        stroke: new Stroke({
-          color: '#11788b',
-          width: 3
-        })
-      }),
+      style: postalCodeHighlightLayerStyle,
       zIndex: 3
     });
     this.map.addLayer(this.postalCodeHighlightLayer);
@@ -279,6 +278,12 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(visualization => {
         this.applyVisualization(visualization);
+      });
+
+    this.store.select(selectIsLoadingSelectedVisualization)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(isLoading => {
+        this.isLoadingVisualization = isLoading;
       });
 
     this.geographicDataApiClient.getGeoJson().subscribe(geojsonObject => {
@@ -368,7 +373,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     const heatmapVisualization = visualization as HeatmapVisualization;
     return heatmapVisualization.legend.map(item => ({
       color: this.withOpacity(item.color, 0.5),
-      label: `Von ${item.fromValue} bis ${item.toValue}`
+      label: `From ${item.fromValue} to ${item.toValue}`
     }));
   }
 
@@ -466,7 +471,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       return this.showPlzLayer ? baseStyle : this.withoutStroke(baseStyle);
     }
 
-    return this.showPlzLayer ? this.defaultStyle : this.withoutStroke(this.defaultStyle);
+    return this.showPlzLayer ? defaultStylePostalLayer : this.withoutStroke(defaultStylePostalLayer);
   }
 
   private updatePlzLayerVisibility(): void {

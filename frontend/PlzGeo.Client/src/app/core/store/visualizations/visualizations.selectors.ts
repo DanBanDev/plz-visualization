@@ -12,3 +12,8 @@ export const selectSelectedVisualization = createSelector(
   selectVisualizationsState,
   (state: VisualizationsState) => state.selectedVisualization
 );
+
+export const selectIsLoadingSelectedVisualization = createSelector(
+  selectVisualizationsState,
+  (state: VisualizationsState) => state.isLoadingSelectedVisualization
+);
