@@ -5,7 +5,7 @@ import { setLayerVisibility } from '../actions/set-layer-visibility.action';
 export const initialState: MapState = {
   selectedPostalCode: null,
   showOsmLayer: true,
-  showPlzLayer: true,
+  showPlzLayer: false,
   showFederalStateBoundariesLayer: true
 };
 

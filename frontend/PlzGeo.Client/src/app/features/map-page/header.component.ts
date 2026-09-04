@@ -1,6 +1,7 @@
-import { Component, Input } from "@angular/core";
+import { Component, EventEmitter, HostListener, Input, OnDestroy, Output, ViewChild } from "@angular/core";
 import { Store } from "@ngrx/store";
 import { MatDialog } from "@angular/material/dialog";
+import { MatMenuTrigger } from "@angular/material/menu";
 import { Observable } from "rxjs";
 import { openHeatmapUploadDialog } from "../../core/store/actions/open-heatmap-dialog.action";
 import { openGroupUploadDialog } from "../../core/store/actions/open-group-dialog.action";
@@ -23,24 +24,27 @@ import { LayersDialogComponent } from "./dialogs/layers-dialog.component";
       <div class="search-container">
         <mat-form-field class="example-full-width">
           <mat-label>Postal Code</mat-label>
-          <input matInput>
+          <input matInput [(ngModel)]="postalCode" (keyup.enter)="searchPostalCode()">
         </mat-form-field>
-        <button mat-raised-button>Search</button>
+        <button mat-raised-button (click)="searchPostalCode()">Search</button>
       </div>
 
       <button mat-raised-button (click)="openHeatmapDialog()">Heatmap Visualization</button>
       <button mat-raised-button (click)="openGroupDialog()">Group Visualization</button>
       <button mat-raised-button (click)="openLayersDialog()">Layers</button>
-      <div class="user-menu" [matMenuTriggerFor]="menu">
-        <mat-label>{{ (user$ | async)?.email || 'User' }}</mat-label>
+      <div
+        class="user-menu"
+        [matMenuTriggerFor]="menu"
+        #userMenuTrigger="matMenuTrigger">
+        <span *ngIf="user$ | async as user">{{ user.email }}</span>
         <mat-icon class="menu-icon">account_circle</mat-icon>
       </div>
-        <mat-menu #menu="matMenu" xPosition="before">
+        <mat-menu #menu="matMenu" xPosition="before" class="user-menu-panel">
           <button mat-menu-item class="reverse-arrow" [matMenuTriggerFor]="visualizationsMenu">My Visualizations</button>
           <button mat-menu-item>Guidance</button>
           <button mat-menu-item (click)="onLogout()">Log Out</button>
         </mat-menu>
-        <mat-menu #visualizationsMenu="matMenu" xPosition="before">
+        <mat-menu #visualizationsMenu="matMenu" xPosition="before" class="visualizations-menu-panel">
           <div class="visualizations-list">
             <div
               class="visualization-item"
@@ -75,7 +79,7 @@ import { LayersDialogComponent } from "./dialogs/layers-dialog.component";
       height: 60px;
     }
     .header-logo {
-      height: 40px;
+      height: 50px;
       margin-left: 10px;
     }
     .user-menu {
@@ -84,6 +88,7 @@ import { LayersDialogComponent } from "./dialogs/layers-dialog.component";
       align-items: center;
       gap: 10px;
       margin-right: 10px;
+      cursor: pointer;
     }
     mat-form-field {
       margin-top:20px;
@@ -171,9 +176,14 @@ import { LayersDialogComponent } from "./dialogs/layers-dialog.component";
 })
 export class HeaderComponent {
   @Input() visualizations: VisualizationInfo[] | null = [];
+  @Output() postalCodeSearch = new EventEmitter<string>();
+  // @ViewChild(MatMenuTrigger) private userMenuTrigger?: MatMenuTrigger;
 
   readonly visualizationType = VisualizationType;
   readonly user$: Observable<User | null>;
+  postalCode = '';
+  private userMenuOpen = false;
+  // private userMenuCloseTimeout: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
     private readonly store: Store,
@@ -199,6 +209,74 @@ export class HeaderComponent {
       width: '320px'
     });
   }
+
+  searchPostalCode(): void {
+    const postalCode = this.postalCode.trim();
+
+    if (postalCode) {
+      this.postalCodeSearch.emit(postalCode);
+    }
+  }
+
+  // openUserMenu(): void {
+  //   this.cancelUserMenuClose();
+  //   this.userMenuTrigger?.openMenu();
+  // }
+
+  // onUserMenuOpened(): void {
+  //   this.userMenuOpen = true;
+  //   this.cancelUserMenuClose();
+  // }
+
+  // onUserMenuClosed(): void {
+  //   this.userMenuOpen = false;
+  //   this.cancelUserMenuClose();
+  // }
+
+  // @HostListener('document:mousemove', ['$event'])
+  // onDocumentMouseMove(event: MouseEvent): void {
+  //   if (!this.userMenuOpen) {
+  //     return;
+  //   }
+
+  //   const target = event.target as Node | null;
+  //   const trigger = document.querySelector('.user-menu');
+  //   const panels = document.querySelectorAll(
+  //     '.user-menu-panel, .visualizations-menu-panel'
+  //   );
+
+  //   if (target && (
+  //     trigger?.contains(target) ||
+  //     Array.from(panels).some(panel => panel.contains(target))
+  //   )) {
+  //     this.cancelUserMenuClose();
+  //     return;
+  //   }
+
+  //   this.scheduleUserMenuClose();
+  // }
+
+  // scheduleUserMenuClose(): void {
+  //   if (!this.userMenuOpen || this.userMenuCloseTimeout) {
+  //     return;
+  //   }
+
+  //   this.userMenuCloseTimeout = setTimeout(() => {
+  //     this.userMenuCloseTimeout = null;
+  //     this.userMenuTrigger?.closeMenu();
+  //   }, 150);
+  // }
+
+  // ngOnDestroy(): void {
+  //   this.cancelUserMenuClose();
+  // }
+
+  // private cancelUserMenuClose(): void {
+  //   if (this.userMenuCloseTimeout) {
+  //     clearTimeout(this.userMenuCloseTimeout);
+  //     this.userMenuCloseTimeout = null;
+  //   }
+  // }
 
   onVisualizationClick(visualization: VisualizationInfo): void {
     this.store.dispatch(

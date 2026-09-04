@@ -13,6 +13,7 @@ import Fill from 'ol/style/Fill';
 import Stroke from 'ol/style/Stroke';
 import Style from 'ol/style/Style';
 import type { StyleFunction } from 'ol/style/Style';
+import { getCenter } from 'ol/extent';
 import { Subject, takeUntil } from "rxjs";
 import { GeographicDataApiClient } from "../../api-clients/apis/geographic-data.api-client";
 import { createGeoJsonVectorLayer } from "../../functions/create-geojson-vector-layer.function";
@@ -139,6 +140,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   private map!: OLMap;
   private osmLayer: TileLayer<OSM> | null = null;
   private vectorLayer: VectorLayer<VectorSource> | null = null;
+  private postalCodeHighlightLayer: VectorLayer<VectorSource> | null = null;
   private federalStateBoundariesLayer: VectorLayer<VectorSource> | null = null;
   private baseStyleFunction: StyleFunction | undefined;
   private showOsmLayer = true;
@@ -229,9 +231,21 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       ],
       view: new View({
         center: [1113194, 6810000],
-        zoom: 10
+        zoom: 7
       })
     });
+
+    this.postalCodeHighlightLayer = new VectorLayer({
+      source: new VectorSource(),
+      style: new Style({
+        stroke: new Stroke({
+          color: '#11788b',
+          width: 3
+        })
+      }),
+      zIndex: 3
+    });
+    this.map.addLayer(this.postalCodeHighlightLayer);
 
     this.map.updateSize();
 
@@ -293,6 +307,30 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  searchPostalCode(postalCode: string): void {
+    const feature = this.featureMap.get(postalCode);
+
+    if (!feature || !this.map || !this.postalCodeHighlightLayer) {
+      return;
+    }
+
+    const geometry = feature.getGeometry();
+
+    if (!geometry) {
+      return;
+    }
+
+    const highlightSource = this.postalCodeHighlightLayer.getSource();
+    highlightSource?.clear();
+    highlightSource?.addFeature(new Feature(geometry));
+
+    this.map.getView().animate({
+      center: getCenter(geometry.getExtent()),
+      zoom: 12,
+      duration: 750
+    });
   }
 
   private applyVisualization(visualization: Visualization | null): void {

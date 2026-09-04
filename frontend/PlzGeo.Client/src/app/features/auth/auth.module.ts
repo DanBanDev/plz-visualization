@@ -9,8 +9,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
-import { LoginPageComponent } from '../login-page/login-page.component';
-import { RegisterPageComponent } from '../register-page/register-page.component';
+import { LoginPageComponent } from './login-page.component';
+import { RegisterPageComponent } from './register-page.component';
 
 @NgModule({
   declarations: [
