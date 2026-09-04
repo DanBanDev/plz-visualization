@@ -5,7 +5,7 @@ import { MatMenuTrigger } from "@angular/material/menu";
 import { Observable } from "rxjs";
 import { openHeatmapUploadDialog } from "../../core/store/actions/open-heatmap-dialog.action";
 import { openGroupUploadDialog } from "../../core/store/actions/open-group-dialog.action";
-import { selectVisualization } from "../../core/store/actions/select-visualization.action";
+import { clearSelectedVisualization, selectVisualization } from "../../core/store/actions/select-visualization.action";
 import { deleteVisualization } from "../../core/store/actions/delete-visualization.action";
 import { logout } from "../../core/store/auth/auth.actions";
 import { selectCurrentUser } from "../../core/store/auth/auth.selectors";
@@ -21,6 +21,9 @@ import { LayersDialogComponent } from "./dialogs/layers-dialog.component";
   template: `
       
       <img src="zip-app-logo.png" alt="ZIP App Logo" class="header-logo">
+      <button mat-icon-button matTooltip="Clear visualization" (click)="clearVisualization()">
+        <mat-icon>deselect</mat-icon>
+      </button>
       <div class="search-container">
         <mat-form-field class="example-full-width">
           <mat-label>Postal Code</mat-label>
@@ -216,6 +219,10 @@ export class HeaderComponent {
     if (postalCode) {
       this.postalCodeSearch.emit(postalCode);
     }
+  }
+
+  clearVisualization(): void {
+    this.store.dispatch(clearSelectedVisualization());
   }
 
   // openUserMenu(): void {

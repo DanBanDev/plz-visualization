@@ -15,3 +15,7 @@ export const selectVisualizationFailure = createAction(
   '[Visualizations] Select Visualization Failure',
   props<{ error: string }>()
 );
+
+export const clearSelectedVisualization = createAction(
+  '[Visualizations] Clear Selected Visualization'
+);
