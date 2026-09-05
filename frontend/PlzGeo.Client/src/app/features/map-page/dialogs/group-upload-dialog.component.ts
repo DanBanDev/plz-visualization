@@ -37,7 +37,7 @@ import { generateGroupLegend, MAX_GROUP_COUNT } from '../../../functions/generat
         <input
           #fileInput
           type="file"
-          accept=".csv"
+          accept=".csv,.txt"
           hidden
           (change)="onFileSelected($event)">
 
@@ -54,32 +54,34 @@ import { generateGroupLegend, MAX_GROUP_COUNT } from '../../../functions/generat
         <span class="error-text">Es wurden mehr als {{ maxGroupCount }} Gruppen erkannt. Bitte eine CSV mit weniger Gruppen wählen.</span>
       </div>
 
-      <!-- Farbauswahl -->
-      <div class="row color-picker-row">
+      <ng-container *ngIf="parsedValues.length > 0">
+        <!-- Farbauswahl -->
+        <div class="row color-picker-row">
 
-        <div class="color-container">
-          <label>Start Color</label>
-          <input
-            type="color"
-            [(ngModel)]="startColor"
-            (input)="updateGradient()">
+          <div class="color-container">
+            <label>Start Color</label>
+            <input
+              type="color"
+              [(ngModel)]="startColor"
+              (input)="updateGradient()">
+          </div>
+
+          <div class="color-container">
+            <label>End Color</label>
+            <input
+              type="color"
+              [(ngModel)]="endColor"
+              (input)="updateGradient()">
+          </div>
+
         </div>
 
-        <div class="color-container">
-          <label>End Color</label>
-          <input
-            type="color"
-            [(ngModel)]="endColor"
-            (input)="updateGradient()">
+        <!-- Farbverlauf -->
+        <div
+          class="gradient-preview"
+          [style.background]="gradientStyle">
         </div>
-
-      </div>
-
-      <!-- Farbverlauf -->
-      <div
-        class="gradient-preview"
-        [style.background]="gradientStyle">
-      </div>
+      </ng-container>
 
       <!-- Dynamische, editierbare Legende -->
       <div class="legend-container">
@@ -265,7 +267,7 @@ export class GroupUploadDialogComponent {
     }
 
     this.selectedFilePath = file.name;
-    this.visualizationName = file.name.replace(/\.csv$/i, '');
+    this.visualizationName = file.name.replace(/\.(csv|txt)$/i, '');
 
     file.text().then(csvText => {
       this.parsedValues = parseGroupCsv(csvText);
