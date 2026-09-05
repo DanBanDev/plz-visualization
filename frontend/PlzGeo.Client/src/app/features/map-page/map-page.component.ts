@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { VisualizationInfo } from '../../models/visualization-info.model';
 import { selectVisualizations } from '../../core/store/visualizations/visualizations.selectors';
 import { MapComponent } from './map.component';
+import { PdfExportOptions } from './dialogs/export-pdf-dialog.component';
 
 
 @Component({
@@ -12,7 +13,8 @@ import { MapComponent } from './map.component';
   template: `
       <app-header
         [visualizations]="visualizations$ | async"
-        (postalCodeSearch)="onPostalCodeSearch($event)">
+        (postalCodeSearch)="onPostalCodeSearch($event)"
+        (pdfExport)="onPdfExport($event)">
       </app-header>
       <app-map #map></app-map>
   `,
@@ -46,5 +48,9 @@ export class MapPageComponent {
 
   onPostalCodeSearch(postalCode: string): void {
     this.mapComponent?.searchPostalCode(postalCode);
+  }
+
+  onPdfExport(options: PdfExportOptions): void {
+    this.mapComponent?.exportToPdf(options);
   }
 }

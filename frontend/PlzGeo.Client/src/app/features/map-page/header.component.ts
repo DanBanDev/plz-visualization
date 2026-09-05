@@ -15,6 +15,7 @@ import { VisualizationType } from "../../models/visualization-type.enum";
 import { ConfirmDeleteDialogComponent } from "./dialogs/confirm-delete-dialog.component";
 import { GuidanceDialogComponent } from "./dialogs/guidance-dialog.component";
 import { LayersDialogComponent } from "./dialogs/layers-dialog.component";
+import { ExportPdfDialogComponent, PdfExportOptions } from "./dialogs/export-pdf-dialog.component";
 
 @Component({
   selector: 'app-header',
@@ -46,6 +47,7 @@ import { LayersDialogComponent } from "./dialogs/layers-dialog.component";
         <mat-menu #menu="matMenu" xPosition="before" class="user-menu-panel">
           <button mat-menu-item class="reverse-arrow" [matMenuTriggerFor]="visualizationsMenu">My Visualizations</button>
           <button mat-menu-item (click)="openGuidanceDialog()">Guidance</button>
+          <button mat-menu-item (click)="openExportDialog()">Export</button>
           <button mat-menu-item (click)="onLogout()">Log Out</button>
         </mat-menu>
         <mat-menu #visualizationsMenu="matMenu" xPosition="before" class="visualizations-menu-panel">
@@ -181,6 +183,7 @@ import { LayersDialogComponent } from "./dialogs/layers-dialog.component";
 export class HeaderComponent {
   @Input() visualizations: VisualizationInfo[] | null = [];
   @Output() postalCodeSearch = new EventEmitter<string>();
+  @Output() pdfExport = new EventEmitter<PdfExportOptions>();
   // @ViewChild(MatMenuTrigger) private userMenuTrigger?: MatMenuTrigger;
 
   readonly visualizationType = VisualizationType;
@@ -218,6 +221,17 @@ export class HeaderComponent {
     this.dialog.open(GuidanceDialogComponent, {
       width: '600px',
       maxWidth: '90vw'
+    });
+  }
+
+  openExportDialog(): void {
+    this.dialog.open(ExportPdfDialogComponent, {
+      width: '360px',
+      maxWidth: '90vw'
+    }).afterClosed().subscribe((options: PdfExportOptions | undefined) => {
+      if (options) {
+        this.pdfExport.emit(options);
+      }
     });
   }
 

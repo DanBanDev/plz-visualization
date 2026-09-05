@@ -19,10 +19,12 @@ import { GroupUploadDialogComponent } from './dialogs/group-upload-dialog.compon
 import { ConfirmDeleteDialogComponent } from './dialogs/confirm-delete-dialog.component';
 import { GuidanceDialogComponent } from './dialogs/guidance-dialog.component';
 import { LayersDialogComponent } from './dialogs/layers-dialog.component';
+import { ExportPdfDialogComponent } from './dialogs/export-pdf-dialog.component';
+import { MatSelectModule } from '@angular/material/select';
 
 
 @NgModule({
-  declarations: [MapPageComponent, HeaderComponent, MapComponent, HeatmapUploadDialogComponent, GroupUploadDialogComponent, ConfirmDeleteDialogComponent, GuidanceDialogComponent, LayersDialogComponent],
+  declarations: [MapPageComponent, HeaderComponent, MapComponent, HeatmapUploadDialogComponent, GroupUploadDialogComponent, ConfirmDeleteDialogComponent, GuidanceDialogComponent, LayersDialogComponent, ExportPdfDialogComponent],
   imports: [
         CommonModule,
         FormsModule,
@@ -35,7 +37,8 @@ import { LayersDialogComponent } from './dialogs/layers-dialog.component';
         MatDividerModule,
         MatProgressSpinnerModule,
         MatTooltipModule,
-        MatCheckboxModule
+        MatCheckboxModule,
+        MatSelectModule
   ],
   exports: [
     MapPageComponent
