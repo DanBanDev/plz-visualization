@@ -40,14 +40,15 @@ import { ExportPdfDialogComponent, PdfExportOptions } from "./dialogs/export-pdf
       <div
         class="user-menu"
         [matMenuTriggerFor]="menu"
+        (mouseenter)="openUserMenu()"
         #userMenuTrigger="matMenuTrigger">
         <span *ngIf="user$ | async as user">{{ user.email }}</span>
         <mat-icon class="menu-icon">account_circle</mat-icon>
       </div>
         <mat-menu #menu="matMenu" xPosition="before" class="user-menu-panel">
           <button mat-menu-item class="reverse-arrow" [matMenuTriggerFor]="visualizationsMenu">My Visualizations</button>
-          <button mat-menu-item (click)="openGuidanceDialog()">Guidance</button>
           <button mat-menu-item (click)="openExportDialog()">Export</button>
+          <button mat-menu-item (click)="openGuidanceDialog()">Guidance</button>
           <button mat-menu-item (click)="onLogout()">Log Out</button>
         </mat-menu>
         <mat-menu #visualizationsMenu="matMenu" xPosition="before" class="visualizations-menu-panel">
@@ -184,13 +185,14 @@ export class HeaderComponent {
   @Input() visualizations: VisualizationInfo[] | null = [];
   @Output() postalCodeSearch = new EventEmitter<string>();
   @Output() pdfExport = new EventEmitter<PdfExportOptions>();
-  // @ViewChild(MatMenuTrigger) private userMenuTrigger?: MatMenuTrigger;
+
+  @ViewChild(MatMenuTrigger) private userMenuTrigger?: MatMenuTrigger;
 
   readonly visualizationType = VisualizationType;
   readonly user$: Observable<User | null>;
   postalCode = '';
   private userMenuOpen = false;
-  // private userMenuCloseTimeout: ReturnType<typeof setTimeout> | null = null;
+ 
 
   constructor(
     private readonly store: Store,
@@ -247,65 +249,9 @@ export class HeaderComponent {
     this.store.dispatch(clearSelectedVisualization());
   }
 
-  // openUserMenu(): void {
-  //   this.cancelUserMenuClose();
-  //   this.userMenuTrigger?.openMenu();
-  // }
-
-  // onUserMenuOpened(): void {
-  //   this.userMenuOpen = true;
-  //   this.cancelUserMenuClose();
-  // }
-
-  // onUserMenuClosed(): void {
-  //   this.userMenuOpen = false;
-  //   this.cancelUserMenuClose();
-  // }
-
-  // @HostListener('document:mousemove', ['$event'])
-  // onDocumentMouseMove(event: MouseEvent): void {
-  //   if (!this.userMenuOpen) {
-  //     return;
-  //   }
-
-  //   const target = event.target as Node | null;
-  //   const trigger = document.querySelector('.user-menu');
-  //   const panels = document.querySelectorAll(
-  //     '.user-menu-panel, .visualizations-menu-panel'
-  //   );
-
-  //   if (target && (
-  //     trigger?.contains(target) ||
-  //     Array.from(panels).some(panel => panel.contains(target))
-  //   )) {
-  //     this.cancelUserMenuClose();
-  //     return;
-  //   }
-
-  //   this.scheduleUserMenuClose();
-  // }
-
-  // scheduleUserMenuClose(): void {
-  //   if (!this.userMenuOpen || this.userMenuCloseTimeout) {
-  //     return;
-  //   }
-
-  //   this.userMenuCloseTimeout = setTimeout(() => {
-  //     this.userMenuCloseTimeout = null;
-  //     this.userMenuTrigger?.closeMenu();
-  //   }, 150);
-  // }
-
-  // ngOnDestroy(): void {
-  //   this.cancelUserMenuClose();
-  // }
-
-  // private cancelUserMenuClose(): void {
-  //   if (this.userMenuCloseTimeout) {
-  //     clearTimeout(this.userMenuCloseTimeout);
-  //     this.userMenuCloseTimeout = null;
-  //   }
-  // }
+  openUserMenu(): void {
+    this.userMenuTrigger?.openMenu();
+  }
 
   onVisualizationClick(visualization: VisualizationInfo): void {
     this.store.dispatch(
