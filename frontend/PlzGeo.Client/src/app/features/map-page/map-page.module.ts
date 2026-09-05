@@ -17,11 +17,12 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { HeatmapUploadDialogComponent } from './dialogs/heatmap-upload-dialog.component';
 import { GroupUploadDialogComponent } from './dialogs/group-upload-dialog.component';
 import { ConfirmDeleteDialogComponent } from './dialogs/confirm-delete-dialog.component';
+import { GuidanceDialogComponent } from './dialogs/guidance-dialog.component';
 import { LayersDialogComponent } from './dialogs/layers-dialog.component';
 
 
 @NgModule({
-  declarations: [MapPageComponent, HeaderComponent, MapComponent, HeatmapUploadDialogComponent, GroupUploadDialogComponent, ConfirmDeleteDialogComponent, LayersDialogComponent],
+  declarations: [MapPageComponent, HeaderComponent, MapComponent, HeatmapUploadDialogComponent, GroupUploadDialogComponent, ConfirmDeleteDialogComponent, GuidanceDialogComponent, LayersDialogComponent],
   imports: [
         CommonModule,
         FormsModule,

@@ -13,6 +13,7 @@ import { User } from "../../models/user.model";
 import { VisualizationInfo } from "../../models/visualization-info.model";
 import { VisualizationType } from "../../models/visualization-type.enum";
 import { ConfirmDeleteDialogComponent } from "./dialogs/confirm-delete-dialog.component";
+import { GuidanceDialogComponent } from "./dialogs/guidance-dialog.component";
 import { LayersDialogComponent } from "./dialogs/layers-dialog.component";
 
 @Component({
@@ -44,7 +45,7 @@ import { LayersDialogComponent } from "./dialogs/layers-dialog.component";
       </div>
         <mat-menu #menu="matMenu" xPosition="before" class="user-menu-panel">
           <button mat-menu-item class="reverse-arrow" [matMenuTriggerFor]="visualizationsMenu">My Visualizations</button>
-          <button mat-menu-item>Guidance</button>
+          <button mat-menu-item (click)="openGuidanceDialog()">Guidance</button>
           <button mat-menu-item (click)="onLogout()">Log Out</button>
         </mat-menu>
         <mat-menu #visualizationsMenu="matMenu" xPosition="before" class="visualizations-menu-panel">
@@ -210,6 +211,13 @@ export class HeaderComponent {
   openLayersDialog(): void {
     this.dialog.open(LayersDialogComponent, {
       width: '320px'
+    });
+  }
+
+  openGuidanceDialog(): void {
+    this.dialog.open(GuidanceDialogComponent, {
+      width: '600px',
+      maxWidth: '90vw'
     });
   }
 
