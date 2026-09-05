@@ -23,6 +23,7 @@ function passwordMatchValidator(control: AbstractControl): ValidationErrors | nu
     <div class="auth-container">
       <mat-card class="auth-card">
         <mat-card-header>
+          <img src="zip-app-logo.png" alt="ZIP App Logo" class="header-logo">
           <mat-card-title>PLZ Visualisierung</mat-card-title>
           <mat-card-subtitle>Registrieren</mat-card-subtitle>
         </mat-card-header>
@@ -106,7 +107,17 @@ function passwordMatchValidator(control: AbstractControl): ValidationErrors | nu
     mat-card-header {
       margin-bottom: 20px;
       text-align: center;
-      display: block;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .header-logo {
+      width: 80px;
+      height: auto;
+      margin-bottom: 16px;
+      order: -1;
     }
 
     .full-width {
@@ -126,6 +137,10 @@ function passwordMatchValidator(control: AbstractControl): ValidationErrors | nu
       align-items: center;
       justify-content: space-between;
       margin-top: 12px;
+    }
+
+    .actions button {
+      width: 100%;
     }
 
     .auth-footer {

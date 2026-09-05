@@ -14,6 +14,7 @@ import { selectAuthError, selectAuthLoading, selectIsAuthenticated } from '../..
     <div class="auth-container">
       <mat-card class="auth-card">
         <mat-card-header>
+          <img src="zip-app-logo.png" alt="ZIP App Logo" class="header-logo">
           <mat-card-title>PLZ Visualisierung</mat-card-title>
           <mat-card-subtitle>Anmelden</mat-card-subtitle>
         </mat-card-header>
@@ -83,7 +84,19 @@ import { selectAuthError, selectAuthLoading, selectIsAuthenticated } from '../..
     mat-card-header {
       margin-bottom: 20px;
       text-align: center;
-      display: block;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+
+
+    .header-logo {
+      width: 80px;
+      height: auto;
+      margin-bottom: 16px;
+      order: -1;
     }
 
     .full-width {
@@ -100,7 +113,7 @@ import { selectAuthError, selectAuthLoading, selectIsAuthenticated } from '../..
 
     .actions {
       display: flex;
-      align-items: center;
+      flex-direction: column;
       justify-content: space-between;
       margin-top: 12px;
     }
