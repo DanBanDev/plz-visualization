@@ -45,15 +45,29 @@ import { postalCodeHighlightLayerStyle } from "../../constants/postal-code-highl
         <div class="legend-subtitle">{{ mappedPostalCodeCount }} PLZ</div>
 
         <div class="legend-container">
-          <div class="legend-row" *ngFor="let row of legendRows">
+          <button
+            type="button"
+            class="legend-row"
+            *ngFor="let row of legendRows; let index = index"
+            [class.legend-row-selected]="selectedLegendRowIndex === index"
+            (click)="highlightLegendRow(index)">
             <div
               class="legend-color"
               [style.background]="row.color">
             </div>
 
             <span class="legend-text">{{ row.label }}</span>
-          </div>
+          </button>
         </div>
+
+        <button
+          *ngIf="selectedLegendRowIndex !== null"
+          mat-button
+          class="deselect-button"
+          matTooltip="deselect highlighted postal codes"
+          (click)="deselectHighlightedPostalCodes()">
+          Deselect
+        </button>
       </div>
     </div>
   `,
@@ -132,6 +146,30 @@ import { postalCodeHighlightLayerStyle } from "../../constants/postal-code-highl
       align-items: center;
       gap: 12px;
       min-height: 24px;
+      width: 100%;
+      padding: 4px;
+      border: 0;
+      border-radius: 4px;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .legend-row:hover,
+    .legend-row:focus-visible {
+      background: rgba(255, 255, 255, 0.45);
+      outline: none;
+    }
+
+    .legend-row-selected {
+      background: rgba(255, 255, 255, 0.7);
+      box-shadow: inset 0 0 0 1px rgba(17, 120, 139, 0.4);
+    }
+
+    .legend-row-selected .legend-text {
+      font-weight: 700;
     }
 
     .legend-color {
@@ -145,6 +183,14 @@ import { postalCodeHighlightLayerStyle } from "../../constants/postal-code-highl
     .legend-text {
       font-size: 13px;
       line-height: 1.25;
+    }
+
+    .deselect-button {
+      align-self: flex-end;
+      min-width: 0;
+      padding: 0 8px;
+      font-size: 12px;
+      line-height: 28px;
     }
     `]
 })
@@ -171,7 +217,8 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
   selectedVisualization: Visualization | null = null;
   isLoadingVisualization = false;
-  legendRows: { color: string; label: string }[] = [];
+  legendRows: LegendRow[] = [];
+  selectedLegendRowIndex: number | null = null;
   mappedPostalCodeCount = 0;
 
 
@@ -338,10 +385,41 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     });
   }
 
+  highlightLegendRow(index: number): void {
+    const legendRow = this.legendRows[index];
+    const highlightSource = this.postalCodeHighlightLayer?.getSource();
+
+    if (!legendRow || !highlightSource || !this.selectedVisualization) {
+      return;
+    }
+
+    highlightSource.clear();
+
+    for (const visualizationValue of this.selectedVisualization.values) {
+      if (!this.isValueInLegendRow(visualizationValue.value, index)) {
+        continue;
+      }
+
+      const geometry = this.featureMap.get(visualizationValue.postalCode)?.getGeometry();
+
+      if (geometry) {
+        highlightSource.addFeature(new Feature(geometry));
+      }
+    }
+
+    this.selectedLegendRowIndex = index;
+  }
+
+  deselectHighlightedPostalCodes(): void {
+    this.postalCodeHighlightLayer?.getSource()?.clear();
+    this.selectedLegendRowIndex = null;
+  }
+
   private applyVisualization(visualization: Visualization | null): void {
     this.selectedVisualization = visualization;
     this.valueMap.clear();
     this.legendRows = [];
+    this.deselectHighlightedPostalCodes();
     this.mappedPostalCodeCount = 0;
 
     if (visualization) {
@@ -361,20 +439,42 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     this.vectorLayer?.changed();
   }
 
-  private buildLegendRows(visualization: Visualization): { color: string; label: string }[] {
+  private buildLegendRows(visualization: Visualization): LegendRow[] {
     if (visualization.type === VisualizationType.Group) {
       const groupVisualization = visualization as GroupVisualization;
       return groupVisualization.legend.map(item => ({
         color: this.withOpacity(item.color, 0.5),
-        label: `${item.name}`
+        label: `${item.name}`,
+        groupValue: item.value
       }));
     }
 
     const heatmapVisualization = visualization as HeatmapVisualization;
     return heatmapVisualization.legend.map(item => ({
       color: this.withOpacity(item.color, 0.5),
-      label: `From ${item.fromValue} to ${item.toValue}`
+      label: `From ${item.fromValue} to ${item.toValue}`,
+      fromValue: item.fromValue,
+      toValue: item.toValue
     }));
+  }
+
+  private isValueInLegendRow(value: number, legendRowIndex: number): boolean {
+    const legendRow = this.legendRows[legendRowIndex];
+
+    if (!legendRow) {
+      return false;
+    }
+
+    if (this.selectedVisualization?.type === VisualizationType.Group) {
+      return value === legendRow.groupValue;
+    }
+
+    return this.legendRows.findIndex(row =>
+      row.fromValue !== undefined
+      && row.toValue !== undefined
+      && value >= row.fromValue
+      && value <= row.toValue
+    ) === legendRowIndex;
   }
 
   private indexFeaturesByPostalCode(vectorSource: VectorSource): void {
@@ -493,6 +593,14 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
     return strokeHiddenStyle;
   }
+}
+
+interface LegendRow {
+  color: string;
+  label: string;
+  groupValue?: number;
+  fromValue?: number;
+  toValue?: number;
 }
 
 
