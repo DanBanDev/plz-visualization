@@ -15,6 +15,15 @@ services:
 
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      
+  backend:
+      build:
+        context: ./backend/PlzGeo.Api
+
+      environment:
+        Jwt__Key: ${JWT_KEY}
+
+        ConnectionStrings__Postgis: Host=${DB_HOST};Port=${DB_PORT};Database=${DB_NAME};Username=${DB_USER};Password=${POSTGRES_PASSWORD}
 
 volumes:
   postgres_data:
