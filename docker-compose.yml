@@ -16,9 +16,11 @@ services:
       volumes:
          - postgres_data:/var/lib/postgresql/data
       
-  backend:
+  backend:  
       build:
         context: ./backend/PlzGeo.Api
+        
+      container_name: backend
                 
       ports:
        - "5000:8080"
