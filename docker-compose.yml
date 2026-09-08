@@ -1,29 +1,48 @@
 services:
 
   postgis:
-    image: postgis/postgis:17-3.5
+      image: postgis/postgis:17-3.5
 
-    container_name: postgis
+      container_name: postgis
 
-    environment:
-      POSTGRES_DB: plzdb
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      environment:
+         POSTGRES_DB: plzdb
+         POSTGRES_USER: admin
+         POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 
-    ports:
-      - "5432:5432"
+      ports:
+         - "5432:5432"
 
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+      volumes:
+         - postgres_data:/var/lib/postgresql/data
       
   backend:
       build:
         context: ./backend/PlzGeo.Api
+                
+      ports:
+       - "5000:8080"
+
+      depends_on:
+       - postgis
 
       environment:
+        ASPNETCORE_ENVIRONMENT: Development
         Jwt__Key: ${JWT_KEY}
-
         ConnectionStrings__Postgis: Host=${DB_HOST};Port=${DB_PORT};Database=${DB_NAME};Username=${DB_USER};Password=${POSTGRES_PASSWORD}
+        
+        
+  frontend:
+      build:
+        context: ./frontend/PlzGeo.Client
+
+      container_name: plzgis-frontend
+
+      ports:
+        - "4200:80"
+
+      depends_on:
+        - backend     
 
 volumes:
   postgres_data:

@@ -2,12 +2,8 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
-
 import { VisualizationInfoDto } from "../dtos/visualization-info.dto";
 import { VisualizationDto } from "../dtos/visualization.dto";
-import { CreateGroupVisualizationDto } from "../dtos/create-group-visualization.dto";
-import { CreateHeatmapVisualizationDto } from "../dtos/create-heatmap-visualization.dto";
-
 import { VisualizationInfo } from "../../models/visualization-info.model";
 import { Visualization } from "../../models/visualization.model";
 import { CreateGroupVisualization } from "../../models/create-group-visualization.model";
