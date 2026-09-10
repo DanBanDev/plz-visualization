@@ -20,8 +20,6 @@ import { GeographicDataApiClient } from "../../api-clients/apis/geographic-data.
 import { createGeoJsonVectorLayer } from "../../functions/create-geojson-vector-layer.function";
 import { Visualization } from "../../models/visualization.model";
 import { VisualizationType } from "../../models/visualization-type.enum";
-import { GroupVisualization } from "../../models/group-visualization.model";
-import { HeatmapVisualization } from "../../models/heatmap-visualization.model";
 import { AppState } from "../../core/store/app-state";
 import { selectIsLoadingSelectedVisualization, selectSelectedVisualization } from "../../core/store/visualizations/visualizations.selectors";
 import { selectShowFederalStateBoundariesLayer, selectShowOsmLayer, selectShowPlzLayer } from "../../core/store/map/map.selectors";
@@ -30,9 +28,12 @@ import { federalBoundariesLayerStyle } from "../../constants/federal-boundaries-
 import { defaultOlMapView } from "../../constants/default-ol-map-view.constant";
 import { postalCodeHighlightLayerStyle } from "../../constants/postal-code-highlight-layer-style.constant";
 import { PdfExportOptions } from '../../models/pdf-export-options.model';
-import { MapPdfExportService, PdfLegendRow } from './services/map-pdf-export.service';
+import { MapPdfExportService } from './services/map-pdf-export.service';
 import { MatSnackBar, MatSnackBarRef } from '@angular/material/snack-bar';
 import { PostalCodeSnackbarComponent } from './postal-code-snackbar.component';
+import { getColorForValue } from '../../functions/get-color-for-value.function';
+import { getPostalCodeFromFeature } from '../../functions/get-postal-code-from-feature.function';
+import { buildLegendRows, LegendRow } from '../../functions/build-legend-rows.function';
 
 @Component({
   selector: 'app-map',
@@ -249,7 +250,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       return this.resolveBaseStyle(feature, resolution);
     }
 
-    const postalCode = this.getPostalCodeFromFeature(feature);
+    const postalCode = getPostalCodeFromFeature(feature);
 
     if (!postalCode) {
       return this.resolveBaseStyle(feature, resolution);
@@ -261,7 +262,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       return this.resolveBaseStyle(feature, resolution);
     }
 
-    const color = this.getColorForValue(value, this.selectedVisualization);
+    const color = getColorForValue(value, this.selectedVisualization);
 
     return this.getStyle(color, this.showPlzLayer);
   };
@@ -457,7 +458,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       return;
     }
 
-    const postalCode = this.getPostalCodeFromFeature(feature as Feature<Geometry>);
+    const postalCode = getPostalCodeFromFeature(feature as Feature<Geometry>);
 
     if (!postalCode) {
       return;
@@ -520,30 +521,11 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       }
 
       this.mappedPostalCodeCount = this.valueMap.size;
-      this.legendRows = this.buildLegendRows(visualization);
+      this.legendRows = buildLegendRows(visualization);
     }
 
     this.updatePlzLayerVisibility();
     this.vectorLayer?.changed();
-  }
-
-  private buildLegendRows(visualization: Visualization): LegendRow[] {
-    if (visualization.type === VisualizationType.Group) {
-      const groupVisualization = visualization as GroupVisualization;
-      return groupVisualization.legend.map(item => ({
-        color: this.withOpacity(item.color, 0.7),
-        label: `${item.name}`,
-        groupValue: item.value
-      }));
-    }
-
-    const heatmapVisualization = visualization as HeatmapVisualization;
-    return heatmapVisualization.legend.map(item => ({
-      color: this.withOpacity(item.color, 0.7),
-      label: `From ${item.fromValue} to ${item.toValue}`,
-      fromValue: item.fromValue,
-      toValue: item.toValue
-    }));
   }
 
   private isValueInLegendRow(value: number, legendRowIndex: number): boolean {
@@ -569,7 +551,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     this.featureMap.clear();
 
     vectorSource.getFeatures().forEach(feature => {
-      const postalCode = this.getPostalCodeFromFeature(feature as Feature<Geometry>);
+      const postalCode = getPostalCodeFromFeature(feature as Feature<Geometry>);
 
       if (!postalCode) {
         return;
@@ -577,28 +559,6 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
       this.featureMap.set(postalCode, feature as Feature<Geometry>);
     });
-  }
-
-  private getPostalCodeFromFeature(feature: Feature<Geometry>): string | null {
-    const postalCode = feature.get('plz') ?? feature.get('postalCode') ?? feature.get('PLZ');
-
-    if (postalCode === null || postalCode === undefined) {
-      return null;
-    }
-
-    return String(postalCode);
-  }
-
-  private getColorForValue(value: number, visualization: Visualization): string {
-    if (visualization.type === VisualizationType.Group) {
-      const groupVisualization = visualization as GroupVisualization;
-      const legendItem = groupVisualization.legend.find(item => item.value === value);
-      return this.withOpacity(legendItem?.color ?? '#eeeeee', 0.7);
-    }
-
-    const heatmapVisualization = visualization as HeatmapVisualization;
-    const legendItem = heatmapVisualization.legend.find(item => value >= item.fromValue && value <= item.toValue);
-    return this.withOpacity(legendItem?.color ?? '#eeeeee', 0.7);
   }
 
   private getStyle(color: string, showStroke: boolean): Style {
@@ -618,38 +578,6 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     }
 
     return style;
-  }
-
-  private withOpacity(color: string, opacity: number): string {
-    if (color.startsWith('#')) {
-      const hex = color.slice(1);
-
-      if (hex.length === 3) {
-        const r = parseInt(hex[0] + hex[0], 16);
-        const g = parseInt(hex[1] + hex[1], 16);
-        const b = parseInt(hex[2] + hex[2], 16);
-        return `rgba(${r}, ${g}, ${b}, ${opacity})`;
-      }
-
-      if (hex.length === 6 || hex.length === 8) {
-        const r = parseInt(hex.slice(0, 2), 16);
-        const g = parseInt(hex.slice(2, 4), 16);
-        const b = parseInt(hex.slice(4, 6), 16);
-        return `rgba(${r}, ${g}, ${b}, ${opacity})`;
-      }
-    }
-
-    const rgbMatch = color.match(/^rgb\((\d+)\s*,\s*(\d+)\s*,\s*(\d+)\)$/i);
-    if (rgbMatch) {
-      return `rgba(${rgbMatch[1]}, ${rgbMatch[2]}, ${rgbMatch[3]}, ${opacity})`;
-    }
-
-    const rgbaMatch = color.match(/^rgba\((\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*([0-9.]+)\)$/i);
-    if (rgbaMatch) {
-      return `rgba(${rgbaMatch[1]}, ${rgbaMatch[2]}, ${rgbaMatch[3]}, ${opacity})`;
-    }
-
-    return color;
   }
 
   private resolveBaseStyle(feature: FeatureLike, resolution: number): Style | Style[] {
@@ -681,12 +609,6 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
     return strokeHiddenStyle;
   }
-}
-
-interface LegendRow extends PdfLegendRow {
-  groupValue?: number;
-  fromValue?: number;
-  toValue?: number;
 }
 
 
