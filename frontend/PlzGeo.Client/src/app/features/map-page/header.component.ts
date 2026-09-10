@@ -15,7 +15,8 @@ import { VisualizationType } from "../../models/visualization-type.enum";
 import { ConfirmDeleteDialogComponent } from "./dialogs/confirm-delete-dialog.component";
 import { GuidanceDialogComponent } from "./dialogs/guidance-dialog.component";
 import { LayersDialogComponent } from "./dialogs/layers-dialog.component";
-import { ExportPdfDialogComponent, PdfExportOptions } from "./dialogs/export-pdf-dialog.component";
+import { ExportPdfDialogComponent } from "./dialogs/export-pdf-dialog.component";
+import { PdfExportOptions } from "../../models/pdf-export-options.model";
 
 @Component({
   selector: 'app-header',

@@ -1,11 +1,6 @@
 import { Component } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
-
-export interface PdfExportOptions {
-  pageFormat: 'a4' | 'a3' | 'letter';
-  orientation: 'portrait' | 'landscape';
-  dpi: 150 | 200 | 300;
-}
+import { PdfExportOptions } from '../../../models/pdf-export-options.model';
 
 @Component({
   selector: 'app-export-pdf-dialog',

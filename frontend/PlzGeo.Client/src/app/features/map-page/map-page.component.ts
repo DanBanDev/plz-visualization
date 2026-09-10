@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { VisualizationInfo } from '../../models/visualization-info.model';
 import { selectVisualizations } from '../../core/store/visualizations/visualizations.selectors';
 import { MapComponent } from './map.component';
-import { PdfExportOptions } from './dialogs/export-pdf-dialog.component';
+import { PdfExportOptions } from '../../models/pdf-export-options.model';
 
 
 @Component({
