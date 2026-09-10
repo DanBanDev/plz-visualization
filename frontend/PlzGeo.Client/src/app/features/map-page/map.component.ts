@@ -37,6 +37,7 @@ import { MapPdfExportService, PdfLegendRow } from './services/map-pdf-export.ser
   template: `
     <div class="map-shell">
       <div #mapContainer class="map-container"></div>
+      <span class="copyright-label">&#64;DanBanDev {{ currentYear }}</span>
 
       <div class="map-loading-overlay" *ngIf="isLoadingVisualization">
         <mat-spinner diameter="44"></mat-spinner>
@@ -100,6 +101,16 @@ import { MapPdfExportService, PdfLegendRow } from './services/map-pdf-export.ser
       z-index: 1001;
       display: grid;
       place-items: center;
+      pointer-events: none;
+    }
+
+    .copyright-label {
+      position: absolute;
+      bottom: 8px;
+      left: 8px;
+      z-index: 1000;
+      color: rgba(0, 0, 0, 0.68);
+      font-size: 12px;
       pointer-events: none;
     }
 
@@ -198,6 +209,7 @@ import { MapPdfExportService, PdfLegendRow } from './services/map-pdf-export.ser
 })
 export class MapComponent implements AfterViewInit, OnDestroy {
   private readonly destroy$ = new Subject<void>();
+  readonly currentYear = new Date().getFullYear();
 
   @ViewChild('mapContainer')
   private mapContainer!: ElementRef<HTMLDivElement>;

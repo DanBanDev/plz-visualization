@@ -48,10 +48,22 @@ import { PdfExportOptions } from '../../../models/pdf-export-options.model';
   `,
   styles: [`
     .dialog-header {
+      position: relative;
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: center;
+      min-height: 48px;
       padding: 0 16px;
+    }
+
+    .dialog-header button {
+      position: absolute;
+      right: 8px;
+    }
+
+    h2[mat-dialog-title] {
+      margin: 0;
+      padding: 0;
     }
 
     .dialog-content {

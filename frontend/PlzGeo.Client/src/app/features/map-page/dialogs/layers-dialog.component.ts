@@ -36,10 +36,20 @@ import { selectShowFederalStateBoundariesLayer, selectShowOsmLayer, selectShowPl
   `,
   styles: [`
     .dialog-header {
+      position: relative;
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      justify-content: center;
+      min-height: 48px;
       padding: 0 16px;
+    }
+    .dialog-header button {
+      position: absolute;
+      right: 8px;
+    }
+    h2[mat-dialog-title] {
+      margin: 0;
+      padding: 0;
     }
     .close-button {
       border: none;

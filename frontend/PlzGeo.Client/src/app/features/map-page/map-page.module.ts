@@ -21,10 +21,11 @@ import { GuidanceDialogComponent } from './dialogs/guidance-dialog.component';
 import { LayersDialogComponent } from './dialogs/layers-dialog.component';
 import { ExportPdfDialogComponent } from './dialogs/export-pdf-dialog.component';
 import { MatSelectModule } from '@angular/material/select';
+import { AboutDialogComponent } from './dialogs/about-dialog.component';
 
 
 @NgModule({
-  declarations: [MapPageComponent, HeaderComponent, MapComponent, HeatmapUploadDialogComponent, GroupUploadDialogComponent, ConfirmDeleteDialogComponent, GuidanceDialogComponent, LayersDialogComponent, ExportPdfDialogComponent],
+  declarations: [MapPageComponent, HeaderComponent, MapComponent, HeatmapUploadDialogComponent, GroupUploadDialogComponent, ConfirmDeleteDialogComponent, GuidanceDialogComponent, LayersDialogComponent, ExportPdfDialogComponent, AboutDialogComponent],
   imports: [
         CommonModule,
         FormsModule,

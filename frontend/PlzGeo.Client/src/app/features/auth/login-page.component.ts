@@ -63,15 +63,25 @@ import { selectAuthError, selectAuthLoading, selectIsAuthenticated } from '../..
           <a routerLink="/register">Hier registrieren</a>
         </mat-card-footer>
       </mat-card>
+      <span class="copyright-label">&#64;DanBanDev {{ currentYear }}</span>
     </div>
   `,
   styles: [`
     .auth-container {
+      position: relative;
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
       background-color: #f5f5f5;
+    }
+
+    .copyright-label {
+      position: absolute;
+      bottom: 8px;
+      left: 8px;
+      color: rgba(0, 0, 0, 0.68);
+      font-size: 12px;
     }
 
     .auth-card {
@@ -139,6 +149,7 @@ import { selectAuthError, selectAuthLoading, selectIsAuthenticated } from '../..
 })
 export class LoginPageComponent implements OnInit, OnDestroy {
   private readonly destroy$ = new Subject<void>();
+  readonly currentYear = new Date().getFullYear();
   loginForm: FormGroup;
   loading$: Observable<boolean>;
   error$: Observable<string | null>;

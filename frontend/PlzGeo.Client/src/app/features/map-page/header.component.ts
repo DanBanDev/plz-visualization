@@ -17,6 +17,7 @@ import { GuidanceDialogComponent } from "./dialogs/guidance-dialog.component";
 import { LayersDialogComponent } from "./dialogs/layers-dialog.component";
 import { ExportPdfDialogComponent } from "./dialogs/export-pdf-dialog.component";
 import { PdfExportOptions } from "../../models/pdf-export-options.model";
+import { AboutDialogComponent } from './dialogs/about-dialog.component';
 
 @Component({
   selector: 'app-header',
@@ -50,6 +51,7 @@ import { PdfExportOptions } from "../../models/pdf-export-options.model";
           <button mat-menu-item class="reverse-arrow" [matMenuTriggerFor]="visualizationsMenu">My Visualizations</button>
           <button mat-menu-item (click)="openExportDialog()">Export</button>
           <button mat-menu-item (click)="openGuidanceDialog()">Guidance</button>
+          <button mat-menu-item (click)="openAboutDialog()">About</button>
           <button mat-menu-item (click)="onLogout()">Log Out</button>
         </mat-menu>
         <mat-menu #visualizationsMenu="matMenu" xPosition="before" class="visualizations-menu-panel">
@@ -223,6 +225,13 @@ export class HeaderComponent {
   openGuidanceDialog(): void {
     this.dialog.open(GuidanceDialogComponent, {
       width: '600px',
+      maxWidth: '90vw'
+    });
+  }
+
+  openAboutDialog(): void {
+    this.dialog.open(AboutDialogComponent, {
+      width: '420px',
       maxWidth: '90vw'
     });
   }
