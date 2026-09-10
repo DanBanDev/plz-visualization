@@ -11,7 +11,11 @@ export class GeographicDataApiClient {
   ) {
   }
 
-  getGeoJson() {
+  getPostalCodeGeoJson() {
     return this.http.get('/simplify-plz-grass-7.geojson');
+  }
+
+  getFederalStateBoundariesGeoJson() {
+    return this.http.get('/federal-layer-bounderies-de.geojson');
   }
 }

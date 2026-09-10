@@ -270,21 +270,10 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       zIndex: 0
     });
 
-    this.federalStateBoundariesLayer = new VectorLayer({
-      source: new VectorSource({
-        url: 'federal-layer-bounderies-de.geojson',
-        format: new GeoJSON()
-      }),
-      style: federalBoundariesLayerStyle,
-      visible: this.showFederalStateBoundariesLayer,
-      zIndex: 2
-    });
-
     this.map = new OLMap({
       target: mapTarget,
       layers: [
-        this.osmLayer,
-        this.federalStateBoundariesLayer
+        this.osmLayer
       ],
       view: defaultOlMapView
     });
@@ -336,7 +325,21 @@ export class MapComponent implements AfterViewInit, OnDestroy {
         this.isLoadingVisualization = isLoading;
       });
 
-    this.geographicDataApiClient.getGeoJson().subscribe(geojsonObject => {
+    this.geographicDataApiClient.getFederalStateBoundariesGeoJson().subscribe(geojsonObject => {
+      this.federalStateBoundariesLayer = new VectorLayer({
+        source: new VectorSource({
+          features: new GeoJSON().readFeatures(geojsonObject, {
+            featureProjection: 'EPSG:3857'
+          })
+        }),
+        style: federalBoundariesLayerStyle,
+        visible: this.showFederalStateBoundariesLayer,
+        zIndex: 2
+      });
+      this.map?.addLayer(this.federalStateBoundariesLayer);
+    });
+
+    this.geographicDataApiClient.getPostalCodeGeoJson().subscribe(geojsonObject => {
       const vectorLayer = createGeoJsonVectorLayer(geojsonObject);
       this.baseStyleFunction = vectorLayer.getStyleFunction() ?? undefined;
       vectorLayer.setStyle(this.vectorStyleFunction);
