@@ -22,10 +22,12 @@ import { LayersDialogComponent } from './dialogs/layers-dialog.component';
 import { ExportPdfDialogComponent } from './dialogs/export-pdf-dialog.component';
 import { MatSelectModule } from '@angular/material/select';
 import { AboutDialogComponent } from './dialogs/about-dialog.component';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { PostalCodeSnackbarComponent } from './postal-code-snackbar.component';
 
 
 @NgModule({
-  declarations: [MapPageComponent, HeaderComponent, MapComponent, HeatmapUploadDialogComponent, GroupUploadDialogComponent, ConfirmDeleteDialogComponent, GuidanceDialogComponent, LayersDialogComponent, ExportPdfDialogComponent, AboutDialogComponent],
+  declarations: [MapPageComponent, HeaderComponent, MapComponent, HeatmapUploadDialogComponent, GroupUploadDialogComponent, ConfirmDeleteDialogComponent, GuidanceDialogComponent, LayersDialogComponent, ExportPdfDialogComponent, AboutDialogComponent, PostalCodeSnackbarComponent],
   imports: [
         CommonModule,
         FormsModule,
@@ -39,7 +41,8 @@ import { AboutDialogComponent } from './dialogs/about-dialog.component';
         MatProgressSpinnerModule,
         MatTooltipModule,
         MatCheckboxModule,
-        MatSelectModule
+        MatSelectModule,
+        MatSnackBarModule
   ],
   exports: [
     MapPageComponent

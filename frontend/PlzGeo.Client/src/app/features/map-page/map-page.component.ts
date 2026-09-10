@@ -14,7 +14,8 @@ import { PdfExportOptions } from '../../models/pdf-export-options.model';
       <app-header
         [visualizations]="visualizations$ | async"
         (postalCodeSearch)="onPostalCodeSearch($event)"
-        (pdfExport)="onPdfExport($event)">
+        (pdfExport)="onPdfExport($event)"
+        (clearMap)="onClearMap()">
       </app-header>
       <app-map #map></app-map>
   `,
@@ -52,5 +53,9 @@ export class MapPageComponent {
 
   onPdfExport(options: PdfExportOptions): void {
     this.mapComponent?.exportToPdf(options);
+  }
+
+  onClearMap(): void {
+    this.mapComponent?.deselectHighlightedPostalCodes();
   }
 }

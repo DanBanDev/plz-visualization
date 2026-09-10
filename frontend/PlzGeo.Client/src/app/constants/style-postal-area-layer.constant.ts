@@ -33,6 +33,10 @@ export const stylePostalAreaLayer =  {
             color: 'blue',
             lineDash: [],
             width: 0.5,
-          })
+          }),
+          // transparent fill so clicks inside the polygon (not just on the stroke) are hit-detected
+          fill: new Fill({
+            color: 'rgba(0, 0, 0, 0)',
+          }),
         }),
         }

@@ -2,6 +2,7 @@ import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild } from "@ang
 import { Store } from "@ngrx/store";
 import OLMap from 'ol/Map';
 import View from 'ol/View';
+import type MapBrowserEvent from 'ol/MapBrowserEvent';
 import Feature, { type FeatureLike } from 'ol/Feature';
 import type Geometry from 'ol/geom/Geometry';
 import TileLayer from 'ol/layer/Tile';
@@ -30,6 +31,8 @@ import { defaultOlMapView } from "../../constants/default-ol-map-view.constant";
 import { postalCodeHighlightLayerStyle } from "../../constants/postal-code-highlight-layer-style.constant";
 import { PdfExportOptions } from '../../models/pdf-export-options.model';
 import { MapPdfExportService, PdfLegendRow } from './services/map-pdf-export.service';
+import { MatSnackBar, MatSnackBarRef } from '@angular/material/snack-bar';
+import { PostalCodeSnackbarComponent } from './postal-code-snackbar.component';
 
 @Component({
   selector: 'app-map',
@@ -228,6 +231,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   private readonly valueMap = new Map<string, number>();
   private readonly styleCache = new Map<string, Style>();
   private readonly strokeHiddenStyleCache = new WeakMap<Style, Style>();
+  private postalCodeSnackBarRef: MatSnackBarRef<PostalCodeSnackbarComponent> | null = null;
 
   selectedVisualization: Visualization | null = null;
   isLoadingVisualization = false;
@@ -265,7 +269,8 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   constructor(
     private readonly store: Store<AppState>,
     private readonly geographicDataApiClient: GeographicDataApiClient,
-    private readonly mapPdfExportService: MapPdfExportService
+    private readonly mapPdfExportService: MapPdfExportService,
+    private readonly snackBar: MatSnackBar
   ) {
   }
 
@@ -296,6 +301,8 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       zIndex: 3
     });
     this.map.addLayer(this.postalCodeHighlightLayer);
+
+    this.map.on('singleclick', event => this.handleMapClick(event));
 
     this.map.updateSize();
 
@@ -431,6 +438,56 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   deselectHighlightedPostalCodes(): void {
     this.postalCodeHighlightLayer?.getSource()?.clear();
     this.selectedLegendRowIndex = null;
+    this.postalCodeSnackBarRef?.dismiss();
+    this.postalCodeSnackBarRef = null;
+  }
+
+  private handleMapClick(event: MapBrowserEvent<PointerEvent | KeyboardEvent | WheelEvent>): void {
+    if (!this.map || !this.vectorLayer) {
+      return;
+    }
+
+    const feature = this.map.forEachFeatureAtPixel(
+      event.pixel,
+      hitFeature => hitFeature,
+      { layerFilter: layer => layer === this.vectorLayer }
+    );
+
+    if (!(feature instanceof Feature)) {
+      return;
+    }
+
+    const postalCode = this.getPostalCodeFromFeature(feature as Feature<Geometry>);
+
+    if (!postalCode) {
+      return;
+    }
+
+    this.highlightPostalCodeArea(postalCode);
+  }
+
+  private highlightPostalCodeArea(postalCode: string): void {
+    const feature = this.featureMap.get(postalCode);
+    const highlightSource = this.postalCodeHighlightLayer?.getSource();
+
+    if (!feature || !highlightSource) {
+      return;
+    }
+
+    const geometry = feature.getGeometry();
+
+    if (!geometry) {
+      return;
+    }
+
+    highlightSource.clear();
+    highlightSource.addFeature(new Feature(geometry));
+
+    this.postalCodeSnackBarRef?.dismiss();
+    this.postalCodeSnackBarRef = this.snackBar.openFromComponent(PostalCodeSnackbarComponent, {
+      data: { postalCode },
+      duration: 6000
+    });
   }
 
   exportToPdf(options: PdfExportOptions): void {

@@ -188,6 +188,7 @@ export class HeaderComponent {
   @Input() visualizations: VisualizationInfo[] | null = [];
   @Output() postalCodeSearch = new EventEmitter<string>();
   @Output() pdfExport = new EventEmitter<PdfExportOptions>();
+  @Output() clearMap = new EventEmitter<void>();
 
   @ViewChild(MatMenuTrigger) private userMenuTrigger?: MatMenuTrigger;
 
@@ -257,6 +258,7 @@ export class HeaderComponent {
 
   clearVisualization(): void {
     this.store.dispatch(clearSelectedVisualization());
+    this.clearMap.emit();
   }
 
   openUserMenu(): void {
