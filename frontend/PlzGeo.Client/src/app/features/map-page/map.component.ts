@@ -486,7 +486,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     this.postalCodeSnackBarRef?.dismiss();
     this.postalCodeSnackBarRef = this.snackBar.openFromComponent(PostalCodeSnackbarComponent, {
       data: { postalCode },
-      duration: 26000
+      duration: 6000
     });
   }
 
