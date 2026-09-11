@@ -1,7 +1,6 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild } from "@angular/core";
 import { Store } from "@ngrx/store";
 import OLMap from 'ol/Map';
-import View from 'ol/View';
 import type MapBrowserEvent from 'ol/MapBrowserEvent';
 import Feature, { type FeatureLike } from 'ol/Feature';
 import type Geometry from 'ol/geom/Geometry';
@@ -487,7 +486,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     this.postalCodeSnackBarRef?.dismiss();
     this.postalCodeSnackBarRef = this.snackBar.openFromComponent(PostalCodeSnackbarComponent, {
       data: { postalCode },
-      duration: 6000
+      duration: 26000
     });
   }
 
@@ -580,7 +579,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     return style;
   }
 
-  private resolveBaseStyle(feature: FeatureLike, resolution: number): Style | Style[] {
+  private resolveBaseStyle(feature: FeatureLike, resolution: number): OneOrMany<Style> {
     const baseStyle = this.baseStyleFunction?.(feature, resolution);
 
     if (baseStyle) {
@@ -594,7 +593,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     this.vectorLayer?.setVisible(true);
   }
 
-  private withoutStroke(style: Style | Style[]): Style | Style[] {
+  private withoutStroke(style: OneOrMany<Style>): OneOrMany<Style> {
     if (Array.isArray(style)) {
       return style.map(item => this.withoutStroke(item) as Style);
     }
@@ -611,4 +610,4 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   }
 }
 
-
+type OneOrMany<Type> = Type | Type[];

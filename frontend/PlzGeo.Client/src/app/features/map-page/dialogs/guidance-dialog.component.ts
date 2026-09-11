@@ -41,6 +41,7 @@ import { Component } from '@angular/core';
       justify-content: center;
       min-height: 48px;
       padding: 0 16px;
+      margin-bottom: 35px;
     }
 
     .dialog-header button {
