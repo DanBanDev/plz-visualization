@@ -150,6 +150,14 @@ export class AppEffects {
     { dispatch: false }
   );
 
+  selectVisualizationOnUploadSuccess$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(uploadHeatmapVisualizationSuccess, uploadGroupVisualizationSuccess),
+        map(({ visualization }) => selectVisualization({ id: visualization.id }))
+      )
+  );
+
   selectVisualization$ = createEffect(
     () =>
       this.actions$.pipe(

@@ -8,6 +8,8 @@ import {
   selectVisualizationSuccess
 } from '../actions/select-visualization.action';
 import { deleteVisualizationSuccess } from '../actions/delete-visualization.action';
+import { uploadHeatmapVisualizationSuccess } from '../actions/upload-heatmap-visualization.action';
+import { uploadGroupVisualizationSuccess } from '../actions/upload-group-visualization.action';
 import { logoutSuccess } from '../auth/auth.actions';
 
 export const initialState: VisualizationsState = {
@@ -22,6 +24,10 @@ export const visualizationsReducer = createReducer(
   on(loadVisualizationsSuccess, (state, { visualizations }) => ({
     ...state,
     items: visualizations
+  })),
+  on(uploadHeatmapVisualizationSuccess, uploadGroupVisualizationSuccess, (state, { visualization }) => ({
+    ...state,
+    items: [...state.items.filter(item => item.id !== visualization.id), visualization]
   })),
   on(selectVisualization, state => ({
     ...state,
