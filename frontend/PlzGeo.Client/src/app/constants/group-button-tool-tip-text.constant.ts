@@ -1,0 +1,1 @@
+export const GROUP_BUTTON_TOOL_TIP_TEXT = 'For the visualisation of postcode groups, in which all postcodes within a group are assigned the same number. E.g. sales territories, service regions.';

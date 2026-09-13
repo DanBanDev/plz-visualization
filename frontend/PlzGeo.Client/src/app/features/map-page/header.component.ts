@@ -12,6 +12,8 @@ import { selectCurrentUser } from "../../core/store/auth/auth.selectors";
 import { User } from "../../models/user.model";
 import { VisualizationInfo } from "../../models/visualization-info.model";
 import { VisualizationType } from "../../models/visualization-type.enum";
+import { HEATMAP_BUTTON_TOOL_TIP_TEXT } from "../../constants/heatmap-button-tool-tip-text.constant";
+import { GROUP_BUTTON_TOOL_TIP_TEXT } from "../../constants/group-button-tool-tip-text.constant";
 import { ConfirmDeleteDialogComponent } from "./dialogs/confirm-delete-dialog.component";
 import { GuidanceDialogComponent } from "./dialogs/guidance-dialog.component";
 import { LayersDialogComponent } from "./dialogs/layers-dialog.component";
@@ -36,8 +38,8 @@ import { AboutDialogComponent } from './dialogs/about-dialog.component';
         <button mat-raised-button (click)="searchPostalCode()">Search</button>
       </div>
 
-      <button mat-raised-button (click)="openHeatmapDialog()">Heatmap Visualization</button>
-      <button mat-raised-button (click)="openGroupDialog()">Group Visualization</button>
+      <button mat-raised-button [matTooltip]="heatmapTooltip" (click)="openHeatmapDialog()">Heatmap Visualization</button>
+      <button mat-raised-button [matTooltip]="groupTooltip" (click)="openGroupDialog()">Group Visualization</button>
       <button mat-raised-button (click)="openLayersDialog()">Layers</button>
       <div
         class="user-menu"
@@ -123,13 +125,9 @@ import { AboutDialogComponent } from './dialogs/about-dialog.component';
     .reverse-arrow ::ng-deep .mat-mdc-menu-submenu-icon {
       transform: rotate(180deg);
     }
-    menu-icon {
-      .mat-icon {
-        font-size: xx-large;
-        height: 30px;
-        width: 30px;
-        }
-      }
+    .menu-icon {
+      transform: scale(1.2);
+    }
     .search-container {
       display: flex;
       flex-direction: row;
@@ -194,6 +192,8 @@ export class HeaderComponent {
 
   readonly visualizationType = VisualizationType;
   readonly user$: Observable<User | null>;
+  readonly heatmapTooltip = HEATMAP_BUTTON_TOOL_TIP_TEXT;
+  readonly groupTooltip = GROUP_BUTTON_TOOL_TIP_TEXT;
   postalCode = '';
   private userMenuOpen = false;
  

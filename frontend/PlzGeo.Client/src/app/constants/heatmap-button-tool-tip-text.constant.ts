@@ -1,0 +1,1 @@
+export const HEATMAP_BUTTON_TOOL_TIP_TEXT = 'For the visualisation of postcodes, in which each postcode is assigned its own value or weighting. E.g. revenue, number of employees ';
