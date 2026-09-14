@@ -63,9 +63,6 @@ data/
 *.qgs
 *.qgd
 
-# GeoJSON generated locally
-*.geojson
-
 
 ########################################
 # Docker
