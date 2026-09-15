@@ -78,11 +78,11 @@ Services:
 
 ```bash
 docker compose up --build
-
+```
 
 ## Screenshots
 
-[Images]
+![PLZ GIS Anwendung](docs/screenshot-plz-gis-app-1.png)
 
 
 ## Setup
