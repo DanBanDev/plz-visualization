@@ -72,7 +72,7 @@ function passwordMatchValidator(control: AbstractControl): ValidationErrors | nu
                 mat-raised-button
                 color="primary"
                 type="submit"
-                [disabled]="registerForm.invalid || (loading$ | async)">
+                [disabled]="registerForm.invalid || (loading$ | async) || true">
                 Registrieren
               </button>
 
