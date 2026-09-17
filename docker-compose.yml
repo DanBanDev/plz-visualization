@@ -11,8 +11,8 @@ services:
          POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 
       ports:
-         - "5432:5432"
-
+         - "127.0.0.1:5432:5432"
+              
       volumes:
          - postgres_data:/var/lib/postgresql/data
       
@@ -23,13 +23,13 @@ services:
       container_name: backend
                 
       ports:
-       - "5000:8080"
+       - "127.0.0.1:5000:8080"
 
       depends_on:
        - postgis
 
       environment:
-        ASPNETCORE_ENVIRONMENT: Development
+        ASPNETCORE_ENVIRONMENT: Production
         Jwt__Key: ${JWT_KEY}
         ConnectionStrings__Postgis: Host=${DB_HOST};Port=${DB_PORT};Database=${DB_NAME};Username=${DB_USER};Password=${POSTGRES_PASSWORD}
         
@@ -41,7 +41,7 @@ services:
       container_name: plzgis-frontend
 
       ports:
-        - "4200:80"
+        - "127.0.0.1:4200:80"
 
       depends_on:
         - backend     
