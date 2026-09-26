@@ -60,13 +60,34 @@ Only authenticated users can create, store and manage visualizations.
 
 ## Architecture
 
-Angular + OpenLayers
-        |
-        v
-ASP.NET Core Web API
-        |
-        v
-PostgreSQL + PostGIS
+```mermaid
+flowchart TB
+
+    User["Client"]
+
+    subgraph Debian["🖥️ Server"]
+
+        ReverseProxy["Nginx Reverse Proxy"]
+
+        subgraph Docker["Docker"]
+
+            Frontend["Angular 19<br/>+ Nginx"]
+
+            Backend["ASP.NET Core API<br/>.NET 10"]
+
+            PostGIS["PostgreSQL<br/>+ PostGIS"]
+
+        end
+
+        ReverseProxy --> Frontend
+        Frontend -->|/api| Backend
+        Backend --> PostGIS
+
+    end
+
+    User --> Domain
+    Domain -->|HTTPS| ReverseProxy
+```
 
 
 ## Running with Docker
