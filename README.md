@@ -60,41 +60,34 @@ Only authenticated users can create, store and manage visualizations.
 
 ## Architecture
 
-Internet
-    |
-    | HTTPS
-    v
-https://my-domain-example.com
-    |
-	|
-    v
-┌───────────────────────────────────────────────┐
-│ Server                       					│	
-│                                               │
-│  ┌─────────────────────────────────────────┐  │
-│  │ Nginx Reverse Proxy                     │  │
-│  │ Ports 80 / 443                          │  │
-│  └─────────────────┬───────────────────────┘  │
-│                    │                          │
-│                    ▼                          │
-│  ┌─────────────────────────────────────────┐  │
-│  │ Frontend Container                      │  │
-│  │ Angular + Nginx                         │  │
-│  └─────────────────┬───────────────────────┘  │
-│                    │ /api                     │
-│                    ▼                          │
-│  ┌─────────────────────────────────────────┐  │
-│  │ Backend Container                       │  │
-│  │ ASP.NET Core Web API                    │  │
-│  └─────────────────┬───────────────────────┘  │
-│                    │                          │
-│                    ▼                          │
-│  ┌─────────────────────────────────────────┐  │
-│  │ PostgreSQL + PostGIS Container      	 │ 	│
-│  │ ASP.NET Identity + Visualization Tables │ 	│
-│  └─────────────────────────────────────────┘  │
-│                                               │
-└───────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+
+    User["Client"]
+
+    subgraph Debian["🖥️ Server"]
+
+        ReverseProxy["Nginx Reverse Proxy"]
+
+        subgraph Docker["Docker"]
+
+            Frontend["Angular 19<br/>+ Nginx"]
+
+            Backend["ASP.NET Core API<br/>.NET 10"]
+
+            PostGIS["PostgreSQL<br/>+ PostGIS"]
+
+        end
+
+        ReverseProxy --> Frontend
+        Frontend -->|/api| Backend
+        Backend --> PostGIS
+
+    end
+
+    User --> Domain
+    Domain -->|HTTPS| ReverseProxy
+```
 
 
 ## Running with Docker
@@ -106,11 +99,11 @@ Services:
 
 ```bash
 docker compose up --build
-
+```
 
 ## Screenshots
 
-[Images]
+![PLZ GIS Anwendung](docs/screenshot-plz-gis-app-1.png)
 
 
 ## Setup
