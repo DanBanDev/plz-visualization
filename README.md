@@ -66,10 +66,10 @@ Internet
     v
 https://my-domain-example.com
     |
+	|
     v
-
 ┌───────────────────────────────────────────────┐
-│ Debian Server (Hetzner)                       │
+│ Server                       					│	
 │                                               │
 │  ┌─────────────────────────────────────────┐  │
 │  │ Nginx Reverse Proxy                     │  │
@@ -81,7 +81,7 @@ https://my-domain-example.com
 │  │ Frontend Container                      │  │
 │  │ Angular + Nginx                         │  │
 │  └─────────────────┬───────────────────────┘  │
-│                    │ /api                    │
+│                    │ /api                     │
 │                    ▼                          │
 │  ┌─────────────────────────────────────────┐  │
 │  │ Backend Container                       │  │
@@ -90,7 +90,8 @@ https://my-domain-example.com
 │                    │                          │
 │                    ▼                          │
 │  ┌─────────────────────────────────────────┐  │
-│  │ PostgreSQL + PostGIS Container          │  │
+│  │ PostgreSQL + PostGIS Container      	 │ 	│
+│  │ ASP.NET Identity + Visualization Tables │ 	│
 │  └─────────────────────────────────────────┘  │
 │                                               │
 └───────────────────────────────────────────────┘
