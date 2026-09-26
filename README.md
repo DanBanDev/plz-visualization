@@ -60,13 +60,40 @@ Only authenticated users can create, store and manage visualizations.
 
 ## Architecture
 
-Angular + OpenLayers
-        |
-        v
-ASP.NET Core Web API
-        |
-        v
-PostgreSQL + PostGIS
+Internet
+    |
+    | HTTPS
+    v
+https://my-domain-example.com
+    |
+    v
+
+┌───────────────────────────────────────────────┐
+│ Debian Server (Hetzner)                       │
+│                                               │
+│  ┌─────────────────────────────────────────┐  │
+│  │ Nginx Reverse Proxy                     │  │
+│  │ Ports 80 / 443                          │  │
+│  └─────────────────┬───────────────────────┘  │
+│                    │                          │
+│                    ▼                          │
+│  ┌─────────────────────────────────────────┐  │
+│  │ Frontend Container                      │  │
+│  │ Angular + Nginx                         │  │
+│  └─────────────────┬───────────────────────┘  │
+│                    │ /api                    │
+│                    ▼                          │
+│  ┌─────────────────────────────────────────┐  │
+│  │ Backend Container                       │  │
+│  │ ASP.NET Core Web API                    │  │
+│  └─────────────────┬───────────────────────┘  │
+│                    │                          │
+│                    ▼                          │
+│  ┌─────────────────────────────────────────┐  │
+│  │ PostgreSQL + PostGIS Container          │  │
+│  └─────────────────────────────────────────┘  │
+│                                               │
+└───────────────────────────────────────────────┘
 
 
 ## Running with Docker
